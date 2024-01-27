@@ -11,5 +11,13 @@ func main() {
 	testEventsGroup := app.Group("/test-events")
 	testEvents.UseTestEventRoutes(testEventsGroup)
 
+	api := app.Group("/api")
+	bootStrapApiRoutes(api)
+
 	app.Start(":3000")
+}
+
+func bootStrapApiRoutes(g *echo.Group) {
+	testEventsGroup := g.Group("/test-events")
+	testEvents.UseInjestTestEventRoutes(testEventsGroup)
 }
