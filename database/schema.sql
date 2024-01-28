@@ -1,13 +1,13 @@
 DROP TABLE IF EXISTS users;
-CREATE users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL,
-    password TEXT NOT NULL,
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    username varchar(255) NOT NULL,
+    password varchar(255) NOT NULL,
 );
 
 DROP TABLE IF EXISTS test_events;
 CREATE TABLE test_events (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
     environmentId INTEGER NOT NULL,
     templateId INTEGER NOT NULL,
     difficultyId INTEGER NOT NULL,
@@ -21,19 +21,19 @@ CREATE TABLE test_events (
 
 DROP TABLE IF EXISTS difficulties;
 CREATE TABLE difficulties (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
     name TEXT NOT NULL,
 );
 
 DROP TABLE IF EXISTS environments;
 CREATE TABLE environments (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
     name TEXT NOT NULL,
 );
 
 DROP TABLE IF EXISTS templates;
 CREATE TABLE templates (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
     playerId varchar(255) NOT NULL,
     templateName VARCHAR(255) NOT NULL,
     name varchar(255) NOT NULL,
@@ -68,7 +68,7 @@ CREATE TABLE players (
 
 DROP TABLE IF EXISTS test_results;
 CREATE TABLE test_results (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
     waveSurvived UNSIGNED SMALLINT NOT NULL check(waveSurvived > 0),
     moneyEarned DECIMAL(14, 2) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -87,6 +87,6 @@ CREATE TABLE player_test_results (
 
 DROP TABLE IF EXISTS catastrophes;
 CREATE TABLE catastrophes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
     name TEXT NOT NULL,
 );

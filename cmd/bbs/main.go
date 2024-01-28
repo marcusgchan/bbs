@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/marcusgchan/bbs/database"
 	"github.com/marcusgchan/bbs/internal/testEvents"
 )
 
@@ -14,7 +15,8 @@ func main() {
 	api := app.Group("/api")
 	bootStrapApiRoutes(api)
 
-	app.Start(":3000")
+	// app.Start(":3000")
+	database.Seed()
 }
 
 func bootStrapApiRoutes(g *echo.Group) {
