@@ -36,15 +36,16 @@ CREATE TABLE templates (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     playerId varchar(255) NOT NULL,
     templateName VARCHAR(255) NOT NULL,
-    name TEXT NOT NULL,
+    name varchar(255) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (playerId) REFERENCES players (id)
 ); 
 
 DROP TABLE IF EXISTS test_event_catastrophes;
 CREATE TABLE test_event_catastrophes (
     testEventId INTEGER NOT NULL,
     catastropheId INTEGER NOT NULL,
-    wave INTEGER NOT NULL check(wave > 0),
+    wave UNSIGNED SMALLINT NOT NULL check(wave > 0),
     FOREIGN KEY (testEventId) REFERENCES test_events (id)
     FOREIGN KEY (catastropheId) REFERENCES catastrophes (id)
 );
@@ -68,7 +69,7 @@ CREATE TABLE players (
 DROP TABLE IF EXISTS test_results;
 CREATE TABLE test_resutls (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    waveSurvived INTEGER NOT NULL,
+    waveSurvived UNSIGNED SMALLINT NOT NULL check(waveSurvived > 0),
     moneyEarned INTEGER NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 );
@@ -77,7 +78,7 @@ DROP TABLE IF EXISTS player_test_results;
 CREATE TABLE player_test_results (
     playerId INTEGER NOT NULL,
     testResultId INTEGER NOT NULL,
-    waveDied INTEGER NOT NULL check(waveDied > 0),
+    waveDied UNSIGNED SMALLINT NOT NULL check(waveDied > 0),
     diedTo INTEGER NOT NULL,
     FOREIGN KEY (playerId) REFERENCES players (id)
     FOREIGN KEY (testResultId) REFERENCES test_results (id)
@@ -88,5 +89,4 @@ DROP TABLE IF EXISTS catastrophes;
 CREATE TABLE catastrophes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 );
