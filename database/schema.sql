@@ -67,10 +67,10 @@ CREATE TABLE players (
 );
 
 DROP TABLE IF EXISTS test_results;
-CREATE TABLE test_resutls (
+CREATE TABLE test_results (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     waveSurvived UNSIGNED SMALLINT NOT NULL check(waveSurvived > 0),
-    moneyEarned INTEGER NOT NULL,
+    moneyEarned DECIMAL(14, 2) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 );
 
