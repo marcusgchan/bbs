@@ -1,0 +1,21 @@
+DROP TABLE IF EXISTS users;
+CREATE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL,
+    password TEXT NOT NULL,
+);
+
+DROP TABLE IF EXISTS test_events;
+CREATE TABLE test_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    environmentId INTEGER NOT NULL,
+    templateId INTEGER NOT NULL,
+    difficulty INTEGER NOT NULL,
+    testResultId INTEGER,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+DROP TABLE IF EXISTS environments;
+
