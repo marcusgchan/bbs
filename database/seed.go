@@ -14,6 +14,7 @@ func Seed() {
 
 	res, err := db.Query("SELECT * FROM users")
 	if err != nil {
+		println("errorsdkafj")
 		panic(err.Error())
 	}
 
