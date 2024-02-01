@@ -8,15 +8,16 @@ import (
 
 func main() {
 	app := echo.New()
+	db := database.Connect()
 
 	testEventsGroup := app.Group("/test-events")
-	testEvents.UseTestEventRoutes(testEventsGroup)
+	testEventsHandler := testEvents.TestEventHandler{DB: db}
+	testEventsGroup.GET("", testEventsHandler.ShowTestEvent)
 
 	api := app.Group("/api")
 	bootStrapApiRoutes(api)
 
-	// app.Start(":3000")
-	database.Seed()
+	app.Start(":3000")
 }
 
 func bootStrapApiRoutes(g *echo.Group) {

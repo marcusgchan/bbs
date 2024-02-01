@@ -2,9 +2,10 @@ package testEvents
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/marcusgchan/bbs/internal"
 )
 
-func UseTestEventRoutes(g *echo.Group) {
+func UseTestEventRoutes(ctx *internal.Context) {
 	g.GET("", handleShowTestEvents)
 }
 

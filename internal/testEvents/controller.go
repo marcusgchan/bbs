@@ -1,14 +1,18 @@
 package testEvents
 
 import (
+	"database/sql"
+
 	"github.com/labstack/echo/v4"
+	"github.com/marcusgchan/bbs/internal"
 	"github.com/marcusgchan/bbs/internal/testEvents/views"
 )
 
-func handleInjestTestEvent(c echo.Context) error {
-	return nil
+type TestEventHandler struct {
+	DB *sql.DB
 }
 
-func handleShowTestEvents(c echo.Context) error {
-	return views.Page().Render(c.Request().Context(), c.Response())
+func (h TestEventHandler) ShowTestEvent(c echo.Context) error {
+	return internal.Render(views.Page(), c)
 }
+
