@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
-	_ "github.com/tursodatabase/libsql-client-go/libsql"
 )
 
 func Connect() *sql.DB {
@@ -15,10 +15,11 @@ func Connect() *sql.DB {
 		log.Fatal("Error loading .env file")
 	}
 
-	db, err := sql.Open("libsql", os.Getenv("DATABASE_URL"))
+	db, err := sql.Open("mysql", os.Getenv("DSN"))
 	if err != nil {
 		log.Fatalf("failed to connect: %v", err)
 	}
+
 	res, err := db.Query("select * from users")
 	if err != nil {
 		log.Fatal(err, res)
