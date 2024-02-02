@@ -11,7 +11,7 @@ locals {
 }
 
 env "dev" {
-    url     = local.env["DATABASE_URL"]
+    url     = local.env["DB_URL"]
     src     = "file://database/schema.sql"
     dev     = "docker://mysql/8/dev"
 }

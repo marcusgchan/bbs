@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 )
 
@@ -15,7 +15,17 @@ func Connect() *sql.DB {
 		log.Fatal("Error loading .env file")
 	}
 
-	db, err := sql.Open("mysql", os.Getenv("DSN"))
+	cfg := mysql.Config{
+		User:                 os.Getenv("DB_USER"),
+		Passwd:               os.Getenv("DB_PASSWORD"),
+		DBName:               os.Getenv("DB_NAME"),
+		Net:                  "tcp",
+		Addr:                 os.Getenv("DB_HOST"),
+		TLSConfig:            "skip-verify",
+		AllowNativePasswords: true,
+	}
+
+	db, err := sql.Open("mysql", cfg.FormatDSN())
 	if err != nil {
 		log.Fatalf("failed to connect: %v", err)
 	}

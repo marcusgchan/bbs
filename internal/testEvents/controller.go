@@ -13,6 +13,5 @@ type TestEventHandler struct {
 }
 
 func (h TestEventHandler) ShowTestEvent(c echo.Context) error {
-	return internal.Render(views.Page(), c)
+	return internal.Render(testEvents.Page(), c)
 }
-
