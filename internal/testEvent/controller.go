@@ -1,11 +1,11 @@
-package testEvents
+package testEvent
 
 import (
 	"database/sql"
 
 	"github.com/labstack/echo/v4"
 	"github.com/marcusgchan/bbs/internal"
-	"github.com/marcusgchan/bbs/internal/testEvents/views"
+	"github.com/marcusgchan/bbs/internal/testEvent/views"
 )
 
 type TestEventHandler struct {
@@ -13,5 +13,5 @@ type TestEventHandler struct {
 }
 
 func (h TestEventHandler) ShowTestEvent(c echo.Context) error {
-	return internal.Render(testEvents.Page(), c)
+	return internal.Render(testEvent.Page(), c)
 }

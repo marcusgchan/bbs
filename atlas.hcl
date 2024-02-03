@@ -16,3 +16,10 @@ env "dev" {
     dev     = "docker://mysql/8/dev"
 }
 
+
+env "turso" {
+    url = local.env["TEST"]
+    exclude = ["_litestream*"]
+    src = "file://database/schema.sql"
+    dev  = "sqlite://dev?mode=memory"
+}
