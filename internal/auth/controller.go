@@ -2,8 +2,6 @@ package auth
 
 import (
 	"context"
-	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -22,11 +20,10 @@ type AuthHandler struct {
 }
 
 func (h AuthHandler) Login(c echo.Context) error {
-	token, err := c.Cookie("access-token")
+	_, err := c.Cookie("access-token")
 	if err != nil {
-		return internal.Render(auth.LoginPage("/test-events"), c)
+		return internal.Render(auth.LoginPage(), c)
 	}
-	fmt.Printf("token: %s\n", token)
 	if strings.Contains(c.Request().URL.String(), "/login") {
 		c.Redirect(302, "/test-events")
 	}
@@ -60,7 +57,6 @@ func (h AuthHandler) HandleLogin(c echo.Context) error {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenStr, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {
-		log.Print(err.Error())
 		return internal.Render(auth.Error(), c)
 	}
 

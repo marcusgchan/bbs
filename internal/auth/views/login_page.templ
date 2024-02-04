@@ -2,7 +2,7 @@ package auth
 
 import "github.com/marcusgchan/bbs/internal/sview"
 
-templ LoginPage(to string) {
+templ LoginPage() {
 	@sview.Base() {
 		<form hx-post="/login" hx-target="#error" class="max-w-sm mx-auto flex flex-col gap-4">
 			<h1 class="text-4xl font-bold mb-5">Login</h1>

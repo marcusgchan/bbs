@@ -13,11 +13,8 @@ import (
 func Authenticated(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		accessToken, err := c.Cookie("access-token")
-		reqUrl := c.Request().URL
-		to := c.FormValue("to")
-		fmt.Printf("reqUrl: %s\n", reqUrl)
 		if err != nil {
-			return internal.Render(auth.LoginPage(to), c)
+			return internal.Render(auth.LoginPage(), c)
 		}
 
 		token, err := jwt.Parse(accessToken.Value, func(token *jwt.Token) (interface{}, error) {
@@ -29,7 +26,7 @@ func Authenticated(next echo.HandlerFunc) echo.HandlerFunc {
 			return []byte(os.Getenv("JWT_SECRET")), nil
 		})
 		if err != nil || !token.Valid {
-			return internal.Render(auth.LoginPage(to), c)
+			return internal.Render(auth.LoginPage(), c)
 		}
 
 		return next(c)
