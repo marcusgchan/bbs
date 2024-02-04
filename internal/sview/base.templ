@@ -1,4 +1,4 @@
-package sharedView
+package sview
 
 templ Base() {
 	<!DOCTYPE html>
@@ -12,7 +12,9 @@ templ Base() {
 			<title>Base Builder Simulator</title>
 		</head>
 		<body>
-			{ children... }
+			<main class="max-w-screen-lg mx-auto p-4">
+				{ children... }
+			</main>
 		</body>
 	</html>
 }

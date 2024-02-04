@@ -6,15 +6,18 @@ import (
 
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
+	"github.com/marcusgchan/bbs/internal"
+	auth "github.com/marcusgchan/bbs/internal/auth/views"
 )
 
 func Authenticated(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		accessToken, err := c.Cookie("access-token")
-		reqUrl := c.Request().Host
-		callBackUrl := fmt.Sprintf("/login?callback=%v", reqUrl)
+		reqUrl := c.Request().URL
+		to := c.FormValue("to")
+		fmt.Printf("reqUrl: %s\n", reqUrl)
 		if err != nil {
-			return c.Redirect(302, callBackUrl)
+			return internal.Render(auth.LoginPage(to), c)
 		}
 
 		token, err := jwt.Parse(accessToken.Value, func(token *jwt.Token) (interface{}, error) {
@@ -26,7 +29,7 @@ func Authenticated(next echo.HandlerFunc) echo.HandlerFunc {
 			return []byte(os.Getenv("JWT_SECRET")), nil
 		})
 		if err != nil || !token.Valid {
-			return c.Redirect(401, callBackUrl)
+			return internal.Render(auth.LoginPage(to), c)
 		}
 
 		return next(c)

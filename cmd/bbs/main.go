@@ -4,13 +4,14 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/marcusgchan/bbs/database"
+	slqc "github.com/marcusgchan/bbs/database/gen"
 	"github.com/marcusgchan/bbs/internal/auth"
-	"github.com/marcusgchan/bbs/internal/testEvent"
+	"github.com/marcusgchan/bbs/internal/testevt"
 )
 
 func main() {
 	app := echo.New()
-	db := database.Connect()
+	db := slqc.New(database.Connect())
 
 	// app.Use(middleware.Logger())
 	app.Use(middleware.StaticWithConfig(middleware.StaticConfig{
@@ -23,8 +24,16 @@ func main() {
 
 	testEventsGroup := app.Group("/test-events")
 	testEventsGroup.Use(auth.Authenticated)
-	testEventsHandler := testEvent.TestEventHandler{DB: db}
+	testEventsHandler := testevt.TestEventHandler{DB: db}
 	testEventsGroup.GET("", testEventsHandler.ShowTestEvent)
+
+	app.GET("/test", func(c echo.Context) error {
+		return c.String(200, "Hello, World!")
+	}, auth.Authenticated)
+
+	app.Any("/*", func(c echo.Context) error {
+		return c.String(200, "Hello, World!")
+	})
 
 	// api := app.Group("/api")
 	// bootStrapApiRoutes(api)

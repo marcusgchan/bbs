@@ -1,59 +1,46 @@
 package auth
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
-	"unicode/utf8"
 
-	sq "github.com/Masterminds/squirrel"
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
+	database "github.com/marcusgchan/bbs/database/gen"
 	"github.com/marcusgchan/bbs/internal"
-	"github.com/marcusgchan/bbs/internal/auth/views"
-	"github.com/marcusgchan/bbs/internal/testEvent/views"
+	auth "github.com/marcusgchan/bbs/internal/auth/views"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthHandler struct {
-	DB *sql.DB
+	DB *database.Queries
 }
 
 func (h AuthHandler) Login(c echo.Context) error {
 	token, err := c.Cookie("access-token")
 	if err != nil {
-		return internal.Render(auth.LoginPage(), c)
+		return internal.Render(auth.LoginPage("/test-events"), c)
 	}
 	fmt.Printf("token: %s\n", token)
-	return c.Redirect(302, "/test-events")
+	if strings.Contains(c.Request().URL.String(), "/login") {
+		c.Redirect(302, "/test-events")
+	}
+	return c.Redirect(302, c.Request().Header.Get("HX-CURRENT-URL"))
 }
 
 func (h AuthHandler) HandleLogin(c echo.Context) error {
 	username := c.FormValue("username")
 	password := c.FormValue("password")
 
-	type User struct {
-		ID       int
-		Username string
-		Password string
-	}
-
-	user := User{}
-
-	err := sq.
-		Select("username, password").
-		RemoveOffset().Limit(1).
-		From("users").
-		Where(sq.Eq{"username": username}).
-		RunWith(h.DB).
-		QueryRow().
-		Scan(&user.Username, &user.Password)
-		// User does not exist
+	// User does not exist
+	ctx := context.Background()
+	user, err := h.DB.GetUser(ctx, username)
 	if err != nil {
-		log.Print(err.Error())
 		return internal.Render(auth.Error(), c)
 	}
 
@@ -74,23 +61,17 @@ func (h AuthHandler) HandleLogin(c echo.Context) error {
 	tokenStr, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {
 		log.Print(err.Error())
-		return c.String(500, "Internal Server Error")
+		return internal.Render(auth.Error(), c)
 	}
 
 	c.SetCookie(&http.Cookie{
-		Name:    "access-token",
-		Value:   tokenStr,
-		Expires: expDate,
+		Name:     "access-token",
+		Value:    tokenStr,
+		Expires:  expDate,
+		SameSite: http.SameSiteStrictMode,
 	})
 
 	headers := c.Response().Header()
-	headers.Set("HX-Retarget", "main")
-
-	callbackUrl := c.QueryParam("callback")
-	if utf8.RuneCountInString(callbackUrl) == 0 {
-		headers.Set("HX-Push-Url", "/test-events")
-		return internal.Render(testEvent.Page(), c)
-	}
-
-	return c.Redirect(302, callbackUrl)
+	headers.Set("HX-Refresh", "true")
+	return c.NoContent(200)
 }

@@ -10,15 +10,8 @@ locals {
     }
 }
 
-env "dev" {
-    url     = local.env["DB_URL"]
-    src     = "file://database/schema.sql"
-    dev     = "docker://mysql/8/dev"
-}
-
-
 env "turso" {
-    url = local.env["TEST"]
+    url = local.env["TEST_URL"]
     exclude = ["_litestream*"]
     src = "file://database/schema.sql"
     dev  = "sqlite://dev?mode=memory"

@@ -5,18 +5,14 @@ go 1.21.6
 require (
 	github.com/a-h/templ v0.2.543
 	github.com/go-sql-driver/mysql v1.7.1
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.11.4
 	golang.org/x/crypto v0.18.0
 )
 
 require (
-	github.com/Masterminds/squirrel v1.5.4 // indirect
-	github.com/go-jet/jet/v2 v2.10.1 // indirect
-	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
-	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 // indirect
-	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect

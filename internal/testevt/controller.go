@@ -1,17 +1,16 @@
-package testEvent
+package testevt
 
 import (
-	"database/sql"
-
 	"github.com/labstack/echo/v4"
+	"github.com/marcusgchan/bbs/database/gen"
 	"github.com/marcusgchan/bbs/internal"
-	"github.com/marcusgchan/bbs/internal/testEvent/views"
+	"github.com/marcusgchan/bbs/internal/testevt/views"
 )
 
 type TestEventHandler struct {
-	DB *sql.DB
+	DB *database.Queries
 }
 
 func (h TestEventHandler) ShowTestEvent(c echo.Context) error {
-	return internal.Render(testEvent.Page(), c)
+	return internal.Render(testevt.Page(), c)
 }
