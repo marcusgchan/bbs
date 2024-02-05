@@ -11,16 +11,16 @@ CREATE TABLE environments (
 CREATE TABLE players (
     id varchar(255) PRIMARY KEY,
     name varchar(255) NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE templates (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     playerId varchar(255) NOT NULL,
-    templateName VARCHAR(255) NOT NULL,
+    data TEXT NOT NULL,
     name varchar(255) NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (playerId) REFERENCES players (id)
 ); 
 
@@ -28,17 +28,17 @@ CREATE TABLE test_results (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     waveSurvived INTEGER  NOT NULL check(waveSurvived > 0),
     moneyEarned DECIMAL(14, 2) NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE test_events (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    environmentId INTEGER  NOT NULL,
+    environmentId INTEGER NOT NULL,
     templateId INTEGER NOT NULL,
     difficultyId INTEGER NOT NULL,
     testResultId INTEGER,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (environmentId) REFERENCES environments (id),
     FOREIGN KEY (templateId) REFERENCES templates (id),
     FOREIGN KEY (testResultId) REFERENCES test_results (id)

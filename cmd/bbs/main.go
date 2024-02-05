@@ -27,21 +27,15 @@ func main() {
 	testEventsHandler := testevt.TestEventHandler{DB: db}
 	testEventsGroup.GET("", testEventsHandler.ShowTestEvent)
 
-	app.GET("/test", func(c echo.Context) error {
-		return c.String(200, "Hello, World!")
-	}, auth.Authenticated)
-
+	// Not found
 	app.Any("/*", func(c echo.Context) error {
-		return c.String(200, "Hello, World!")
+		return c.String(404, "Page not found.")
 	})
 
-	// api := app.Group("/api")
-	// bootStrapApiRoutes(api)
+	api := app.Group("/api")
+	// Remember to auth!!!!!!!!!!!!!!!!!!!!!!!!!
+	testEvtApiGroup := api.Group("/test-events")
+	testEvtApiGroup.POST("", testEventsHandler.InjestTestEvent)
 
 	app.Start(":3000")
 }
-
-// func bootStrapApiRoutes(g *echo.Group) {
-// 	testEventsGroup := g.Group("/test-events")
-// 	testEvents.UseInjestTestEventRoutes(testEventsGroup)
-// }
