@@ -35,7 +35,7 @@ func main() {
 	api := app.Group("/api")
 	// Remember to auth!!!!!!!!!!!!!!!!!!!!!!!!!
 	testEvtApiGroup := api.Group("/test-events")
-	testEvtApiGroup.POST("", testEventsHandler.InjestTestEvent)
+	testEvtApiGroup.POST("", testEventsHandler.CreateTestEvent)
 
 	app.Start(":3000")
 }
