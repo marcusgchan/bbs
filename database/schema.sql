@@ -6,7 +6,7 @@ CREATE TABLE players (
 );
 
 CREATE TABLE templates (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id varchar(255) PRIMARY KEY,
     playerId varchar(255) NOT NULL,
     data TEXT NOT NULL,
     name varchar(255) NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE test_results (
 );
 
 CREATE TABLE test_events (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id varchar(255) PRIMARY KEY,
     environment varchar(255) NOT NULL,
     difficulty varchar(255) NOT NULL,
     templateId INTEGER NOT NULL,
@@ -34,15 +34,16 @@ CREATE TABLE test_events (
 );
 
 CREATE TABLE test_event_catastrophes (
-    testEventId INTEGER NOT NULL,
+    testEventId varchar(255) NOT NULL,
     catastrophe varchar(255) NOT NULL,
     wave INTEGER NOT NULL check(wave > 0),
     FOREIGN KEY (testEventId) REFERENCES test_events (id)
 );
 
 CREATE TABLE test_event_players (
-    testEventId INTEGER NOT NULL,
+    testEventId varchar(255) NOT NULL,
     playerId varchar(255) NOT NULL,
+    PRIMARY KEY (testEventId, playerId),
     FOREIGN KEY (testEventId) REFERENCES test_events (id),
     FOREIGN KEY (playerId) REFERENCES players (id)
 );
@@ -57,6 +58,7 @@ CREATE TABLE player_test_results (
     testResultId INTEGER NOT NULL,
     waveDied INTEGER NOT NULL check(waveDied > 0),
     diedTo varchar(255) NOT NULL,
+    PRIMARY KEY (playerId, testResultId),
     FOREIGN KEY (playerId) REFERENCES players (id),
     FOREIGN KEY (testResultId) REFERENCES test_results (id)
 );
