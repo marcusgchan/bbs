@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"database/sql"
 	"net/http"
 	"os"
 	"strings"
@@ -16,7 +17,8 @@ import (
 )
 
 type AuthHandler struct {
-	DB *database.Queries
+	Q  *database.Queries
+	DB *sql.DB
 }
 
 func (h AuthHandler) Login(c echo.Context) error {
@@ -36,7 +38,7 @@ func (h AuthHandler) HandleLogin(c echo.Context) error {
 
 	// User does not exist
 	ctx := context.Background()
-	user, err := h.DB.GetUser(ctx, username)
+	user, err := h.Q.GetUser(ctx, username)
 	if err != nil {
 		return internal.Render(auth.Error(), c)
 	}

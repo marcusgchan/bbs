@@ -11,7 +11,8 @@ import (
 
 func main() {
 	app := echo.New()
-	db := slqc.New(database.Connect())
+	db := database.Connect()
+	q := slqc.New(db)
 
 	// app.Use(middleware.Logger())
 	app.Use(middleware.StaticWithConfig(middleware.StaticConfig{
@@ -19,12 +20,12 @@ func main() {
 		Browse: false,
 	}))
 
-	app.GET("/login", auth.AuthHandler{DB: db}.Login)
-	app.POST("/login", auth.AuthHandler{DB: db}.HandleLogin)
+	app.GET("/login", auth.AuthHandler{Q: q, DB: db}.Login)
+	app.POST("/login", auth.AuthHandler{Q: q, DB: db}.HandleLogin)
 
 	testEventsGroup := app.Group("/test-events")
 	testEventsGroup.Use(auth.Authenticated)
-	testEventsHandler := testevt.TestEventHandler{DB: db}
+	testEventsHandler := testevt.TestEventHandler{Q: q, DB: db}
 	testEventsGroup.GET("", testEventsHandler.ShowTestEvent)
 
 	// Not found
