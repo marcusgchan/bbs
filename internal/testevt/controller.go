@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"github.com/marcusgchan/bbs/database/gen"
+	database "github.com/marcusgchan/bbs/database/gen"
 	"github.com/marcusgchan/bbs/internal"
-	"github.com/marcusgchan/bbs/internal/testevt/views"
+	testevt "github.com/marcusgchan/bbs/internal/testevt/views"
 )
 
 type TestEventHandler struct {
@@ -89,25 +89,58 @@ func (h TestEventHandler) CreateTemplate(c echo.Context) error {
 }
 
 type CreateTestResultReq struct {
-	TestResultID int64 `json:"testResultId"`
-	MoneyEarned  int64 `json:"moneyEarned"`
-	Damage       int64 `json:"damage"`
-	Player       []struct {
+	TestEvtID   string `json:"testEvtId"`
+	MoneyEarned int64  `json:"moneyEarned"`
+	Damage      int64  `json:"damage"`
+	Player      []struct {
 		ID       string `json:"id"`
 		WaveDied int64  `json:"waveDied"`
 		DiedTo   string `json:"diedTo"`
 	}
+	Date string `json:"date"`
 }
 
 func (h TestEventHandler) CreatePlayerTestResult(c echo.Context) error {
 	data := new(CreateTestResultReq)
+	err := json.NewDecoder(c.Request().Body).Decode(data)
+	if err != nil {
+		return err
+	}
+	date, err := time.Parse(time.UnixDate, data.Date)
+	if err != nil {
+		return err
+	}
+	tx, err := h.DB.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
 	// Create general test result
-	err := h.Q.CreateTestResult(c.Request().Context(), database.CreateTestResultParams{
+	createdTestResId, err := h.Q.CreateTestResult(c.Request().Context(), database.CreateTestResultParams{
 		Moneyearned: data.MoneyEarned,
+		Createdat:   date,
+		Updatedat:   date,
 	})
-	// Create player test result
-
-	return nil
+	if err != nil {
+		return err
+	}
+	err = h.Q.UpdateTestEvtWithTestRes(c.Request().Context(), database.UpdateTestEvtWithTestResParams{
+		Testresultid: sql.NullInt64{Int64: createdTestResId, Valid: true},
+		ID:           data.TestEvtID,
+	})
+	for _, p := range data.Player {
+		// Create player test result
+		h.Q.CreatePlayerTestResult(c.Request().Context(), database.CreatePlayerTestResultParams{
+			Playerid:     p.ID,
+			Testresultid: createdTestResId,
+			Wavedied:     p.WaveDied,
+			Diedto:       p.DiedTo,
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return c.NoContent(204)
 }
 
 func (h TestEventHandler) CreateTestResult(c echo.Context) error {
