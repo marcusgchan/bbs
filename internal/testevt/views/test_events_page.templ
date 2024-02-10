@@ -1,11 +1,41 @@
 package testevt
 
-import "github.com/marcusgchan/bbs/internal/sview"
+import (
+	"github.com/marcusgchan/bbs/internal/sview"
+)
 
-templ Page() {
+type TestEvtProps struct {
+	ID          string
+	Environment string
+	Difficulty  string
+	StartedAt   string
+	HasEnded    bool
+}
+
+templ TestEvtPage(props []TestEvtProps) {
 	@sview.Base() {
-		<div>
-			<h1>Page</h1>
-		</div>
+		<table>
+			<thead>
+				<th class="min-w-24">ID</th>
+				<th class="min-w-24">Environment</th>
+				<th class="min-w-24">Dificulty</th>
+				<th class="min-w-24">Started At</th>
+			</thead>
+			<tbody>
+				for _, prop := range props {
+					<tr>
+						<td>{ prop.ID }</td>
+						<td>{ prop.Environment }</td>
+						<td>{ prop.Difficulty }</td>
+						<td>{ prop.StartedAt }</td>
+						if prop.HasEnded {
+							<td>Ongoing</td>
+						} else {
+							<td>Finished</td>
+						}
+					</tr>
+				}
+			</tbody>
+		</table>
 	}
 }

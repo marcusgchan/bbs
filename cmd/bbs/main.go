@@ -14,7 +14,7 @@ func main() {
 	db := database.Connect()
 	q := slqc.New(db)
 
-	// app.Use(middleware.Logger())
+	app.Use(middleware.Logger())
 	app.Use(middleware.StaticWithConfig(middleware.StaticConfig{
 		Root:   "build",
 		Browse: false,

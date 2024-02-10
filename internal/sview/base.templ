@@ -11,8 +11,16 @@ templ Base() {
 			<script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
 			<title>Base Builder Simulator</title>
 		</head>
-		<body>
-			<main class="max-w-screen-lg mx-auto p-4">
+		<body class="max-w-screen-lg mx-auto p-4">
+			<header class="flex justify-between">
+				<h1>Base Builder Simulator</h1>
+				<nav>
+					<ul>
+						<li><a href="/test-events">Test Events</a></li>
+					</ul>
+				</nav>
+			</header>
+			<main>
 				{ children... }
 			</main>
 		</body>

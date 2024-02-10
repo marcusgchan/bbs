@@ -18,8 +18,7 @@ CREATE TABLE templates (
 CREATE TABLE test_results (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     moneyEarned INTEGER NOT NULL,
-    createdAt DATETIME NOT NULL,
-    updatedAt DATETIME NOT NULL
+    endedAt DATETIME NOT NULL
 );
 
 CREATE TABLE test_events (
@@ -28,8 +27,7 @@ CREATE TABLE test_events (
     difficulty varchar(255) NOT NULL,
     templateId INTEGER NOT NULL,
     testResultId INTEGER,
-    createdAt DATETIME NOT NULL,
-    updatedAt DATETIME NOT NULL,
+    startedAt DATETIME NOT NULL,
     FOREIGN KEY (templateId) REFERENCES templates (id),
     FOREIGN KEY (testResultId) REFERENCES test_results (id)
 );

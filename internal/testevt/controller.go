@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	database "github.com/marcusgchan/bbs/database/gen"
 	"github.com/marcusgchan/bbs/internal"
-	testevt "github.com/marcusgchan/bbs/internal/testevt/views"
+	views "github.com/marcusgchan/bbs/internal/testevt/views"
 )
 
 type TestEventHandler struct {
@@ -17,7 +17,23 @@ type TestEventHandler struct {
 }
 
 func (h TestEventHandler) ShowTestEvent(c echo.Context) error {
-	return internal.Render(testevt.Page(), c)
+	data, err := h.Q.GetTestEvts(c.Request().Context())
+	if err != nil {
+		emptyData := []views.TestEvtProps{}
+		return internal.Render(views.TestEvtPage(emptyData), c)
+	}
+	length := len(data)
+	mappedData := make([]views.TestEvtProps, length)
+	for i, d := range data {
+		mappedData[i] = views.TestEvtProps{
+			ID:          d.ID,
+			Environment: d.Environment,
+			Difficulty:  d.Difficulty,
+			StartedAt:   "",
+			HasEnded:    d.Testresultid.Valid,
+		}
+	}
+	return internal.Render(views.TestEvtPage(mappedData), c)
 }
 
 type CreateTestEvtReq struct {
@@ -48,7 +64,7 @@ func (h TestEventHandler) CreateTestEvent(c echo.Context) error {
 	qtx := h.Q.WithTx(tx)
 	err = qtx.CreateTestEvt(c.Request().Context(), database.CreateTestEvtParams{
 		Environment: data.EnvironmentName,
-		Createdat:   date,
+		Startedat:   date,
 		Difficulty:  data.Difficulty,
 	})
 	if err != nil {
@@ -118,8 +134,7 @@ func (h TestEventHandler) CreatePlayerTestResult(c echo.Context) error {
 	// Create general test result
 	createdTestResId, err := h.Q.CreateTestResult(c.Request().Context(), database.CreateTestResultParams{
 		Moneyearned: data.MoneyEarned,
-		Createdat:   date,
-		Updatedat:   date,
+		Endedat:     date,
 	})
 	if err != nil {
 		return err
