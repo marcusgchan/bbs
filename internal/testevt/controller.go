@@ -104,16 +104,17 @@ func (h TestEventHandler) CreateTemplate(c echo.Context) error {
 	return c.NoContent(204)
 }
 
+type player struct {
+	ID       string `json:"id"`
+	WaveDied int64  `json:"waveDied"`
+	DiedTo   string `json:"diedTo"`
+}
+
 type CreateTestResultReq struct {
-	TestEvtID   string `json:"testEvtId"`
-	MoneyEarned int64  `json:"moneyEarned"`
-	Damage      int64  `json:"damage"`
-	Player      []struct {
-		ID       string `json:"id"`
-		WaveDied int64  `json:"waveDied"`
-		DiedTo   string `json:"diedTo"`
-	}
-	Date string `json:"date"`
+	TestEvtID   string   `json:"testEvtId"`
+	MoneyEarned int64    `json:"moneyEarned"`
+	Players     []player `json:"players"`
+	Date        string   `json:"date"`
 }
 
 func (h TestEventHandler) CreatePlayerTestResult(c echo.Context) error {
