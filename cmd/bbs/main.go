@@ -6,6 +6,7 @@ import (
 	"github.com/marcusgchan/bbs/database"
 	slqc "github.com/marcusgchan/bbs/database/gen"
 	"github.com/marcusgchan/bbs/internal/auth"
+	"github.com/marcusgchan/bbs/internal/player"
 	"github.com/marcusgchan/bbs/internal/testevt"
 )
 
@@ -27,6 +28,11 @@ func main() {
 	testEventsGroup.Use(auth.Authenticated)
 	testEventsHandler := testevt.TestEventHandler{Q: q, DB: db}
 	testEventsGroup.GET("", testEventsHandler.ShowTestEvent)
+
+	playersGroup := app.Group("/players")
+	playersGroup.Use(auth.Authenticated)
+	playersHandler := player.PlayerHandler{Q: q, DB: db}
+	playersGroup.GET("", playersHandler.ShowPlayerList)
 
 	// Not found
 	app.Any("/*", func(c echo.Context) error {

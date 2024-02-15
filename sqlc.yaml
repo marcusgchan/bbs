@@ -3,6 +3,7 @@ sql:
     - engine: "sqlite"
       queries:
           - "./database/queries/testevt.sql"
+          - "./database/queries/player.sql"
       schema: "./database/schema.sql"
       gen:
           go:
