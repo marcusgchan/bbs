@@ -2,4 +2,4 @@
 SELECT * FROM players;
 
 -- name: CreatePlayer :exec
-INSERT INTO players (id, name) VALUES (?, ?);
+INSERT OR REPLACE INTO players (id, name) VALUES (?, ?);
