@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/marcusgchan/bbs/database"
@@ -44,5 +46,9 @@ func main() {
 	testEvtApiGroup := api.Group("/test-events")
 	testEvtApiGroup.POST("", testEventsHandler.CreateTestEvent)
 
-	app.Start(":3000")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
+	app.Start(":" + port)
 }
