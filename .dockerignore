@@ -2,7 +2,5 @@
 **/.env
 **/build
 **/.DS_Store
-**/*_templ.go
 
-**/database/gen
 fly.toml
