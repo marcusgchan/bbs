@@ -46,5 +46,5 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	testEvtApiGroup := api.Group("/test-events")
 	testEvtApiGroup.POST("", testEventsHandler.CreateTestEvent)
 
-	app.Start(":3000")
+	app.ServeHTTP(w, r)
 }
