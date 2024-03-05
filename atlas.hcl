@@ -11,7 +11,7 @@ locals {
 }
 
 env "turso" {
-    url = local.env["TEST_URL"]
+    url = local.env["DB_URL"]
     exclude = ["_litestream*"]
     src = "file://database/schema.sql"
     dev  = "sqlite://dev?mode=memory"

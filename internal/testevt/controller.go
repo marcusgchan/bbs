@@ -29,7 +29,7 @@ func (h TestEventHandler) ShowTestEvent(c echo.Context) error {
 			ID:          d.ID,
 			Environment: d.Environment,
 			Difficulty:  d.Difficulty,
-			StartedAt:   "",
+			StartedAt:   d.Startedat.String(),
 			HasEnded:    d.Testresultid.Valid,
 		}
 	}
@@ -157,8 +157,4 @@ func (h TestEventHandler) CreatePlayerTestResult(c echo.Context) error {
 		}
 	}
 	return c.NoContent(204)
-}
-
-func (h TestEventHandler) CreateTestResult(c echo.Context) error {
-	return nil
 }

@@ -32,13 +32,6 @@ CREATE TABLE test_events (
     FOREIGN KEY (testResultId) REFERENCES test_results (id)
 );
 
-CREATE TABLE test_event_catastrophes (
-    testEventId varchar(255) NOT NULL,
-    catastrophe varchar(255) NOT NULL,
-    wave INTEGER NOT NULL check(wave > 0),
-    FOREIGN KEY (testEventId) REFERENCES test_events (id)
-);
-
 CREATE TABLE users(
     username varchar(255) NOT NULL,
     password varchar(255) NOT NULL
