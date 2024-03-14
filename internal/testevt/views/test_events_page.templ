@@ -2,6 +2,7 @@ package testevt
 
 import (
 	"github.com/marcusgchan/bbs/internal/sview"
+	"fmt"
 )
 
 type TestEvtProps struct {
@@ -20,20 +21,25 @@ templ TestEvtPage(props []TestEvtProps) {
 
 templ TestEvtContent(props []TestEvtProps) {
 	<section>
-		<table>
+		<table class="w-full">
 			<thead>
-				<th class="min-w-24">ID</th>
-				<th class="min-w-24">Environment</th>
-				<th class="min-w-24">Dificulty</th>
-				<th class="min-w-24">Started At</th>
+				<th class="p-2 min-w-24 text-start">ID</th>
+				<th class="p-2 min-w-24 text-start">Environment</th>
+				<th class="p-2 min-w-24 text-start">Dificulty</th>
+				<th class="p-2 min-w-24 text-start">Started At</th>
 			</thead>
 			<tbody>
 				for _, prop := range props {
-					<tr>
-						<td>{ prop.ID }</td>
-						<td>{ prop.Environment }</td>
-						<td>{ prop.Difficulty }</td>
-						<td>{ prop.StartedAt }</td>
+					<tr
+						hx-get={ string(templ.URL(fmt.Sprintf("/test-events/%s", prop.ID))) }
+						class="cursor-pointer hover:bg-gray-100"
+						hx-swap="innerHTML"
+						hx-target="main"
+					>
+						<td class="p-2">{ prop.ID }</td>
+						<td class="p-2">{ prop.Environment }</td>
+						<td class="p-2">{ prop.Difficulty }</td>
+						<td class="p-2">{ prop.StartedAt }</td>
 						if prop.HasEnded {
 							<td>Ongoing</td>
 						} else {

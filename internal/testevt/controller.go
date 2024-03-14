@@ -33,6 +33,13 @@ func (h TestEventHandler) GetTestEvtPage(c echo.Context) error {
 			HasEnded:    d.Testresultid.Valid,
 		}
 	}
+	mappedData = append(mappedData, views.TestEvtProps{
+		ID:          "1",
+		Environment: "test",
+		Difficulty:  "test",
+		StartedAt:   "test",
+		HasEnded:    false,
+	})
 	return internal.Render(views.TestEvtPage(mappedData), c)
 }
 
@@ -53,6 +60,13 @@ func (h TestEventHandler) GetTestEvtContent(c echo.Context) error {
 			HasEnded:    d.Testresultid.Valid,
 		}
 	}
+	mappedData = append(mappedData, views.TestEvtProps{
+		ID:          "1",
+		Environment: "test",
+		Difficulty:  "test",
+		StartedAt:   "test",
+		HasEnded:    false,
+	})
 	return internal.Render(views.TestEvtContent(mappedData), c)
 }
 
