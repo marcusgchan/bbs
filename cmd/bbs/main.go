@@ -48,7 +48,7 @@ func main() {
 	// Not found
 	app.Any("/*", func(c echo.Context) error {
 		return internal.Render(sview.Base(), c)
-	})
+	}, auth.Authenticated)
 
 	api := app.Group("/api")
 	// Remember to auth!!!!!!!!!!!!!!!!!!!!!!!!!
