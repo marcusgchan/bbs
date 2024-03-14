@@ -16,7 +16,7 @@ type TestEventHandler struct {
 	DB *sql.DB
 }
 
-func (h TestEventHandler) ShowTestEvent(c echo.Context) error {
+func (h TestEventHandler) GetTestEvtPage(c echo.Context) error {
 	data, err := h.Q.GetTestEvts(c.Request().Context())
 	if err != nil {
 		emptyData := []views.TestEvtProps{}
@@ -34,6 +34,26 @@ func (h TestEventHandler) ShowTestEvent(c echo.Context) error {
 		}
 	}
 	return internal.Render(views.TestEvtPage(mappedData), c)
+}
+
+func (h TestEventHandler) GetTestEvtContent(c echo.Context) error {
+	data, err := h.Q.GetTestEvts(c.Request().Context())
+	if err != nil {
+		emptyData := []views.TestEvtProps{}
+		return internal.Render(views.TestEvtPage(emptyData), c)
+	}
+	length := len(data)
+	mappedData := make([]views.TestEvtProps, length)
+	for i, d := range data {
+		mappedData[i] = views.TestEvtProps{
+			ID:          d.ID,
+			Environment: d.Environment,
+			Difficulty:  d.Difficulty,
+			StartedAt:   d.Startedat.String(),
+			HasEnded:    d.Testresultid.Valid,
+		}
+	}
+	return internal.Render(views.TestEvtContent(mappedData), c)
 }
 
 type CreateTestEvtReq struct {

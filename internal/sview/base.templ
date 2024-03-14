@@ -16,7 +16,9 @@ templ Base() {
 				<h1>Base Builder Simulator</h1>
 				<nav>
 					<ul>
-						<li><a href="/test-events">Test Events</a></li>
+						<li>
+							<a hx-get="/test-events/content" hx-swap-="innerHTML" hx-target="main">Test Events</a>
+						</li>
 					</ul>
 				</nav>
 			</header>

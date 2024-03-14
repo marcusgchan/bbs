@@ -14,6 +14,12 @@ type TestEvtProps struct {
 
 templ TestEvtPage(props []TestEvtProps) {
 	@sview.Base() {
+		@TestEvtContent(props)
+	}
+}
+
+templ TestEvtContent(props []TestEvtProps) {
+	<section>
 		<table>
 			<thead>
 				<th class="min-w-24">ID</th>
@@ -37,5 +43,5 @@ templ TestEvtPage(props []TestEvtProps) {
 				}
 			</tbody>
 		</table>
-	}
+	</section>
 }
