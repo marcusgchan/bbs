@@ -1,6 +1,8 @@
 ARG GO_VERSION=1
 FROM golang:${GO_VERSION}-alpine as builder
 
+ENV CGO_ENABLED=0
+
 # Install system dependencies including 'make'
 RUN apk update && apk add --no-cache gcc libc-dev make
 
