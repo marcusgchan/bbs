@@ -41,12 +41,6 @@ type TestEvent struct {
 	Startedat    time.Time
 }
 
-type TestEventCatastrophe struct {
-	Testeventid string
-	Catastrophe string
-	Wave        int64
-}
-
 type TestResult struct {
 	ID          int64
 	Moneyearned int64

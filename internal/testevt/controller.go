@@ -22,25 +22,8 @@ func (h TestEventHandler) GetTestEvtPage(c echo.Context) error {
 		emptyData := []views.TestEvtProps{}
 		return internal.Render(views.TestEvtPage(emptyData), c)
 	}
-	length := len(data)
-	mappedData := make([]views.TestEvtProps, length)
-	for i, d := range data {
-		mappedData[i] = views.TestEvtProps{
-			ID:          d.ID,
-			Environment: d.Environment,
-			Difficulty:  d.Difficulty,
-			StartedAt:   d.Startedat.String(),
-			HasEnded:    d.Testresultid.Valid,
-		}
-	}
-	mappedData = append(mappedData, views.TestEvtProps{
-		ID:          "1",
-		Environment: "test",
-		Difficulty:  "test",
-		StartedAt:   "test",
-		HasEnded:    false,
-	})
-	return internal.Render(views.TestEvtPage(mappedData), c)
+
+	return internal.Render(views.TestEvtPage(TransformToTestEvtProps(data)), c)
 }
 
 func (h TestEventHandler) GetTestEvtContent(c echo.Context) error {
@@ -49,25 +32,25 @@ func (h TestEventHandler) GetTestEvtContent(c echo.Context) error {
 		emptyData := []views.TestEvtProps{}
 		return internal.Render(views.TestEvtPage(emptyData), c)
 	}
-	length := len(data)
-	mappedData := make([]views.TestEvtProps, length)
-	for i, d := range data {
-		mappedData[i] = views.TestEvtProps{
-			ID:          d.ID,
-			Environment: d.Environment,
-			Difficulty:  d.Difficulty,
-			StartedAt:   d.Startedat.String(),
-			HasEnded:    d.Testresultid.Valid,
-		}
+
+	return internal.Render(views.TestEvtContent(TransformToTestEvtProps(data)), c)
+}
+
+type TestEvtResultsProps struct {
+	testEvtID string `json:"testEventId"`
+}
+
+func (h TestEventHandler) GetTestEvtResultsPage(c echo.Context) error {
+	props := new(TestEvtResultsProps)
+	err := json.NewDecoder(c.Request().Body).Decode(props)
+	if err != nil {
+		return err
 	}
-	mappedData = append(mappedData, views.TestEvtProps{
-		ID:          "1",
-		Environment: "test",
-		Difficulty:  "test",
-		StartedAt:   "test",
-		HasEnded:    false,
-	})
-	return internal.Render(views.TestEvtContent(mappedData), c)
+	evtData, err := h.Q.GetTestEvtResults(c.Request().Context(), props.testEvtID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 type CreateTestEvtReq struct {

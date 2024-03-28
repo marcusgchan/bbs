@@ -18,3 +18,16 @@ INSERT INTO player_test_results (playerId, testResultId, waveDied, diedTo) VALUE
 
 -- name: GetTestEvts :many
 SELECT * FROM test_events;
+
+-- name: GetTestEvtResults :one
+SELECT sqlc.embed(test_events), sqlc.embed(test_results), sqlc.embed(templates)
+FROM test_events
+JOIN test_results ON test_events.testResultId = test_results.id
+JOIN templates ON test_events.templateId = templates.id
+WHERE test_events.id = ?;
+
+-- name: GetTestEvtPlayerResults :many
+SELECT sqlc.embed(player_test_results), sqlc.embed(players)
+FROM player_test_results
+JOIN players ON player_test_results.playerId = players.id
+WHERE player_test_results.testResultId = ?;
