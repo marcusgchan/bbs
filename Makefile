@@ -1,5 +1,3 @@
-include .env
-
 run:
 	templ generate
 	tailwindcss -o ./build/output.css 
