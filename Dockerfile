@@ -8,7 +8,7 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
 FROM base AS build
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=86f41c16-56f7-4121-b03b-097e276cf191,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm run build
 
 
