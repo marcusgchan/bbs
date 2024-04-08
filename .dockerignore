@@ -1,6 +1,3 @@
-# flyctl launch added from .gitignore
 **/.env
 **/build
 **/.DS_Store
-
-fly.toml

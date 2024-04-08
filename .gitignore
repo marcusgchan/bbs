@@ -4,4 +4,6 @@ build
 
 *_templ.go
 
+node_modules
+
 database/gen
