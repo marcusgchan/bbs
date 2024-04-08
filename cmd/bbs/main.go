@@ -28,7 +28,7 @@ func main() {
 	app.Use(middleware.Logger())
 	app.Use(middleware.StaticWithConfig(middleware.StaticConfig{
 		Root:   "build",
-		Browse: false,
+		Browse: true,
 	}))
 
 	app.GET("/login", auth.AuthHandler{Q: q, DB: db}.Login)
