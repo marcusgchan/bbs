@@ -10,7 +10,6 @@ RUN corepack enable
 FROM base AS build
 RUN --mount=type=cache,id=s/86f41c16-56f7-4121-b03b-097e276cf191-pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm run build
-RUN ls /app/build
 
 
 FROM golang:${GO_VERSION}-alpine as builder
@@ -26,6 +25,7 @@ RUN go install github.com/a-h/templ/cmd/templ@latest
 COPY . .
 
 COPY --from=build /app/build /app/build
+RUN ls /app/build
 
 RUN templ generate
 
