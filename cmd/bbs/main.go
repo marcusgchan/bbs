@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -14,6 +15,7 @@ import (
 	"github.com/marcusgchan/bbs/internal/player"
 	"github.com/marcusgchan/bbs/internal/sview"
 	"github.com/marcusgchan/bbs/internal/testevt"
+	"github.com/marcusgchan/bbs/web"
 )
 
 func main() {
@@ -27,8 +29,7 @@ func main() {
 
 	app.Use(middleware.Logger())
 	app.Use(middleware.StaticWithConfig(middleware.StaticConfig{
-		Root:   "build",
-		Browse: true,
+		Filesystem: http.FS(web.StaticFS),
 	}))
 
 	app.GET("/login", auth.AuthHandler{Q: q, DB: db}.Login)
@@ -45,10 +46,9 @@ func main() {
 	playersHandler := player.PlayerHandler{Q: q, DB: db}
 	playersGroup.GET("", playersHandler.ShowPlayerList)
 
-	// Not found
-	app.Any("/*", func(c echo.Context) error {
+	app.GET("/*", func(c echo.Context) error {
 		return internal.Render(sview.Base(), c)
-	}, auth.Authenticated)
+	})
 
 	api := app.Group("/api")
 	// Remember to auth!!!!!!!!!!!!!!!!!!!!!!!!!
