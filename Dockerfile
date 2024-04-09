@@ -24,8 +24,7 @@ RUN go install github.com/a-h/templ/cmd/templ@latest
 
 COPY . .
 
-COPY --from=build /app/build /app/build
-RUN ls /app/build
+COPY --from=build /app/web/static /app/web/static
 
 RUN templ generate
 

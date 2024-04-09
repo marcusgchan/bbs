@@ -6,7 +6,7 @@
     "main": "index.js",
     "scripts": {
         "dev": "vite",
-        "build": "tailwindcss -o ./web/static/output.css ",
+        "build": "tailwindcss -o ./web/static/output.css",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [],
