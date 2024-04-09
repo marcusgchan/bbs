@@ -47,8 +47,8 @@ func main() {
 	playersGroup.GET("", playersHandler.ShowPlayerList)
 
 	app.GET("/*", func(c echo.Context) error {
-		return internal.Render(sview.Base(), c)
-	})
+		return internal.Render(sview.NotFoundPage(), c)
+	}, auth.Authenticated)
 
 	api := app.Group("/api")
 	// Remember to auth!!!!!!!!!!!!!!!!!!!!!!!!!

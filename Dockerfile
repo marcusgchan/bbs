@@ -22,7 +22,7 @@ RUN go mod download && go mod verify
 
 RUN go install github.com/a-h/templ/cmd/templ@latest
 
-COPY . .
+COPY . /app
 
 COPY --from=build /app/web/static /app/web/static
 
