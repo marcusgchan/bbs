@@ -14,10 +14,8 @@ templ PlayersPage(players []PlayerProps) {
 }
 
 templ PlayersContent(players []PlayerProps) {
-	<section class="space-y-2">
-		<h1 class="text-xl">Players</h1>
-		@PlayersTable(players)
-	</section>
+	<h1 class="text-xl">Players</h1>
+	@PlayersTable(players)
 }
 
 templ PlayersTable(players []PlayerProps) {

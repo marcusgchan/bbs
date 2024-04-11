@@ -33,7 +33,7 @@ type TestEvtResultsProps struct {
 	TestEvtID string `json:"testEventId"`
 }
 
-func (h TestEventHandler) GetTestEvtResultsPage(c echo.Context) error {
+func (h TestEventHandler) GetTestEvtResPage(c echo.Context) error {
 	props := new(TestEvtResultsProps)
 	err := json.NewDecoder(c.Request().Body).Decode(props)
 	if err != nil {
@@ -50,11 +50,11 @@ func (h TestEventHandler) GetTestEvtResultsPage(c echo.Context) error {
 		return err
 	}
 
-	transEvtData, transPlayerData := TransToEvtResProps(evtData, playerData)
+	transEvtData, template, transPlayerData := TransformToEvtResProps(evtData, playerData)
 	if internal.FromHTMX(c) {
-		return internal.Render(views.TestEvtResContent(transEvtData, transPlayerData), c)
+		return internal.Render(views.TestEvtResContent(transEvtData, template, transPlayerData), c)
 	}
-	return internal.Render(views.TestEvtResPage(transEvtData, transPlayerData), c)
+	return internal.Render(views.TestEvtResPage(transEvtData, template, transPlayerData), c)
 }
 
 type CreateTestEvtReq struct {

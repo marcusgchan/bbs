@@ -20,35 +20,33 @@ templ TestEvtPage(props []TestEvtProps) {
 }
 
 templ TestEvtContent(props []TestEvtProps) {
-	<section class="space-y-2">
-		<h1 class="text-xl">Test Events</h1>
-		<table class="w-full">
-			<thead>
-				<th class="p-2 min-w-24 text-start">ID</th>
-				<th class="p-2 min-w-24 text-start">Environment</th>
-				<th class="p-2 min-w-24 text-start">Dificulty</th>
-				<th class="p-2 min-w-24 text-start">Started At</th>
-			</thead>
-			<tbody>
-				for _, prop := range props {
-					<tr
-						hx-get={ string(templ.URL(fmt.Sprintf("/test-events/%s", prop.ID))) }
-						class="cursor-pointer hover:bg-gray-100"
-						hx-swap="innerHTML"
-						hx-target="main"
-					>
-						<td class="p-2">{ prop.ID }</td>
-						<td class="p-2">{ prop.Environment }</td>
-						<td class="p-2">{ prop.Difficulty }</td>
-						<td class="p-2">{ prop.StartedAt }</td>
-						if prop.HasEnded {
-							<td>Ongoing</td>
-						} else {
-							<td>Finished</td>
-						}
-					</tr>
-				}
-			</tbody>
-		</table>
-	</section>
+	<h1 class="text-xl">Test Events</h1>
+	<table class="w-full">
+		<thead>
+			<th class="p-2 min-w-24 text-start">ID</th>
+			<th class="p-2 min-w-24 text-start">Environment</th>
+			<th class="p-2 min-w-24 text-start">Dificulty</th>
+			<th class="p-2 min-w-24 text-start">Started At</th>
+		</thead>
+		<tbody>
+			for _, prop := range props {
+				<tr
+					hx-get={ string(templ.URL(fmt.Sprintf("/test-events/%s", prop.ID))) }
+					class="cursor-pointer hover:bg-gray-100"
+					hx-swap="innerHTML"
+					hx-target="main"
+				>
+					<td class="p-2">{ prop.ID }</td>
+					<td class="p-2">{ prop.Environment }</td>
+					<td class="p-2">{ prop.Difficulty }</td>
+					<td class="p-2">{ prop.StartedAt }</td>
+					if prop.HasEnded {
+						<td>Ongoing</td>
+					} else {
+						<td>Finished</td>
+					}
+				</tr>
+			}
+		</tbody>
+	</table>
 }

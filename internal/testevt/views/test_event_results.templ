@@ -1,5 +1,7 @@
 package testevt;
 
+import "github.com/marcusgchan/bbs/internal/sview"
+
 type TestEvtPlayerRes struct {
 	ID       string
 	Name     string
@@ -17,8 +19,46 @@ type TestEvtResProps struct {
 	moneyEarned string
 }
 
-templ TestEvtResPage(evtRes TestEvtResProps, playerRes []TestEvtPlayerRes) {
+type TestEvtTemplateRes struct {
+	ID    string
+	Owner string
+	Data  string
 }
 
-templ TestEvtResContent(evtRes TestEvtResProps, playerRes []TestEvtPlayerRes) {
+templ TestEvtResPage(evtRes TestEvtResProps, template TestEvtTemplateRes, playerRes []TestEvtPlayerRes) {
+	@sview.Base() {
+		<h1 class="text-xl">Test Event Results</h1>
+		@TestEvtResContent(evtRes, template, playerRes)
+	}
+}
+
+templ TestEvtResContent(evtRes TestEvtResProps, template TestEvtTemplateRes, playerRes []TestEvtPlayerRes) {
+	<div class="space-y-2">
+		<div class="flex gap-4">
+			<div>
+				<h2>Test Event ID: { evtRes.TestEvtID }</h2>
+				<h2>Difficulty: { evtRes.Difficulty }</h2>
+				<h2>Environment: { evtRes.Environment }</h2>
+				<h2>Started At: { evtRes.StartedAt }</h2>
+				<h2>Ended At: { evtRes.EndedAt }</h2>
+				<h2>Duration: { evtRes.Duration }</h2>
+				<h2>Money Earned: { evtRes.moneyEarned }</h2>
+			</div>
+			<div>
+				<h2>Template ID: { template.ID }</h2>
+				<h2>Owner: { template.Owner }</h2>
+				<h2>Data: { template.Data }</h2>
+			</div>
+		</div>
+		<ul>
+			for _, player := range playerRes {
+				<li>
+					<h2>Player ID: { player.ID }</h2>
+					<h2>Name: { player.Name }</h2>
+					<h2>Died To: { player.DiedTo }</h2>
+					<h2>Wave Died: { player.WaveDied }</h2>
+				</li>
+			}
+		</ul>
+	</div>
 }

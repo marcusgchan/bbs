@@ -23,7 +23,7 @@ func TransformToTestEvtProps(data []database.TestEvent) []testevt.TestEvtProps {
 	return mappedData
 }
 
-func TransToEvtResProps(evtData database.GetTestEvtResultsRow, playerData []database.GetTestEvtPlayerResultsRow) (testevt.TestEvtResProps, []testevt.TestEvtPlayerRes) {
+func TransformToEvtResProps(evtData database.GetTestEvtResultsRow, playerData []database.GetTestEvtPlayerResultsRow) (testevt.TestEvtResProps, testevt.TestEvtTemplateRes, []testevt.TestEvtPlayerRes) {
 	playerInfo := make([]testevt.TestEvtPlayerRes, len(playerData))
 	for i, p := range playerData {
 		playerInfo[i] = testevt.TestEvtPlayerRes{
@@ -42,5 +42,10 @@ func TransToEvtResProps(evtData database.GetTestEvtResultsRow, playerData []data
 		EndedAt:     evtData.TestResult.Endedat.String(),
 		Duration:    fmt.Sprintf("%.2f", duration.Minutes()),
 	}
-	return testResInfo, playerInfo
+	template := testevt.TestEvtTemplateRes{
+		ID:    evtData.Template.ID,
+		Owner: evtData.Template.Name,
+		Data:  evtData.Template.Data,
+	}
+	return testResInfo, template, playerInfo
 }
