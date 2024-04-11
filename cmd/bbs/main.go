@@ -27,7 +27,7 @@ func main() {
 	db := database.Connect()
 	q := slqc.New(db)
 
-	app.Use(middleware.Logger())
+	// app.Use(middleware.Logger())
 	app.Use(middleware.StaticWithConfig(middleware.StaticConfig{
 		Filesystem: http.FS(web.StaticFS),
 	}))
@@ -39,7 +39,6 @@ func main() {
 	testEventsGroup.Use(auth.Authenticated)
 	testEventsHandler := testevt.TestEventHandler{Q: q, DB: db}
 	testEventsGroup.GET("", testEventsHandler.GetTestEvtPage)
-	testEventsGroup.GET("/content", testEventsHandler.GetTestEvtContent)
 
 	playersGroup := app.Group("/players")
 	playersGroup.Use(auth.Authenticated)

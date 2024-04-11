@@ -6,12 +6,17 @@ templ Base() {
 		@Head()
 		<body class="max-w-screen-lg mx-auto p-4 space-y-4">
 			<header class="flex justify-between">
-				<h1 class="text-xl">Base Builder Simulator</h1>
+				<span class="text-xl">Base Builder Simulator</span>
 				<nav>
-					<ul>
+					<ul class="flex gap-2">
 						<li>
-							<a hx-get="/test-events/content" hx-swap-="innerHTML" hx-target="main" hx-push-url="true">
+							<a hx-get="/test-events" hx-swap-="innerHTML" hx-target="main" hx-push-url="true">
 								Test Events
+							</a>
+						</li>
+						<li>
+							<a hx-get="/players" hx-swap-="innerHTML" hx-target="main" hx-push-url="true">
+								Players
 							</a>
 						</li>
 					</ul>

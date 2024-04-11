@@ -19,9 +19,9 @@ type PlayerHandler struct {
 func (h PlayerHandler) ShowPlayerList(c echo.Context) error {
 	data, err := h.Q.GetPlayers(c.Request().Context())
 	if err != nil {
-		emptyData := []player.PlayerProps{}
-		return internal.Render(player.PlayersTable(emptyData), c)
+		return err
 	}
+
 	players := make([]player.PlayerProps, len(data))
 	for i, d := range data {
 		players[i] = player.PlayerProps{
@@ -29,7 +29,12 @@ func (h PlayerHandler) ShowPlayerList(c echo.Context) error {
 			Name: d.Name,
 		}
 	}
-	return internal.Render(player.PlayersTable(players), c)
+
+	if internal.FromHTMX(c) {
+		return internal.Render(player.PlayersContent(players), c)
+	}
+
+	return internal.Render(player.PlayersPage(players), c)
 }
 
 type CreatePlayerReq struct {

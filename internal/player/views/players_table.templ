@@ -1,18 +1,40 @@
 package player
 
+import "github.com/marcusgchan/bbs/internal/sview"
+
 type PlayerProps struct {
 	ID   string
 	Name string
 }
 
+templ PlayersPage(players []PlayerProps) {
+	@sview.Base() {
+		@PlayersContent(players)
+	}
+}
+
+templ PlayersContent(players []PlayerProps) {
+	<section class="space-y-2">
+		<h1 class="text-xl">Players</h1>
+		@PlayersTable(players)
+	</section>
+}
+
 templ PlayersTable(players []PlayerProps) {
-	<table>
+	<table class="w-full">
 		<thead>
 			<tr>
-				<th>Id</th>
-				<th>Name</th>
+				<th class="text-start">ID</th>
+				<th class="text-start">Name</th>
 			</tr>
 		</thead>
-		<tbody></tbody>
+		<tbody>
+			for _, player := range players {
+				<tr>
+					<td>{ player.ID }</td>
+					<td>{ player.Name }</td>
+				</tr>
+			}
+		</tbody>
 	</table>
 }

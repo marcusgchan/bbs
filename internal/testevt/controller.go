@@ -20,21 +20,14 @@ type TestEventHandler struct {
 func (h TestEventHandler) GetTestEvtPage(c echo.Context) error {
 	data, err := h.Q.GetTestEvts(c.Request().Context())
 	if err != nil {
-		emptyData := []views.TestEvtProps{}
-		return internal.Render(views.TestEvtPage(emptyData), c)
+		return err
+	}
+
+	if internal.FromHTMX(c) {
+		return internal.Render(views.TestEvtContent(TransformToTestEvtProps(data)), c)
 	}
 
 	return internal.Render(views.TestEvtPage(TransformToTestEvtProps(data)), c)
-}
-
-func (h TestEventHandler) GetTestEvtContent(c echo.Context) error {
-	data, err := h.Q.GetTestEvts(c.Request().Context())
-	if err != nil {
-		emptyData := []views.TestEvtProps{}
-		return internal.Render(views.TestEvtPage(emptyData), c)
-	}
-
-	return internal.Render(views.TestEvtContent(TransformToTestEvtProps(data)), c)
 }
 
 type TestEvtResultsProps struct {
