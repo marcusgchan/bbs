@@ -1,4 +1,24 @@
 package testevt;
 
-templ TestEvtResultsPage() {
+type TestEvtPlayerRes struct {
+	ID       string
+	Name     string
+	DiedTo   string
+	WaveDied string
+}
+
+type TestEvtResProps struct {
+	TestEvtID   string
+	Difficulty  string
+	Environment string
+	StartedAt   string
+	EndedAt     string
+	Duration    string
+	moneyEarned string
+}
+
+templ TestEvtResPage(evtRes TestEvtResProps, playerRes []TestEvtPlayerRes) {
+}
+
+templ TestEvtResContent(evtRes TestEvtResProps, playerRes []TestEvtPlayerRes) {
 }

@@ -3,7 +3,6 @@ package testevt
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -40,12 +39,22 @@ func (h TestEventHandler) GetTestEvtResultsPage(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+
 	evtData, err := h.Q.GetTestEvtResults(c.Request().Context(), props.TestEvtID)
 	if err != nil {
 		return err
 	}
-	fmt.Printf("evtData: %v", evtData)
-	return nil
+
+	playerData, err := h.Q.GetTestEvtPlayerResults(c.Request().Context(), evtData.TestResult.ID)
+	if err != nil {
+		return err
+	}
+
+	transEvtData, transPlayerData := TransToEvtResProps(evtData, playerData)
+	if internal.FromHTMX(c) {
+		return internal.Render(views.TestEvtResContent(transEvtData, transPlayerData), c)
+	}
+	return internal.Render(views.TestEvtResPage(transEvtData, transPlayerData), c)
 }
 
 type CreateTestEvtReq struct {
