@@ -56,6 +56,9 @@ func main() {
 	testEvtApiGroup := api.Group("/test-events")
 	testEvtApiGroup.POST("", testEventsHandler.CreateTestEvent)
 
+	playerApiGroup := api.Group("/players")
+	playerApiGroup.POST("", playersHandler.CreatePlayer)
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "3000"
