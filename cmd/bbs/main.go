@@ -59,6 +59,9 @@ func main() {
 	playerApiGroup := api.Group("/players")
 	playerApiGroup.POST("", playersHandler.CreatePlayer)
 
+	templateApiGroup := api.Group("/templates")
+	templateApiGroup.POST("", testEventsHandler.CreateTemplate)
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "3000"
