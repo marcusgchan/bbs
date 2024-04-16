@@ -3,6 +3,7 @@ package player
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -35,6 +36,19 @@ func (h PlayerHandler) ShowPlayerList(c echo.Context) error {
 	}
 
 	return internal.Render(player.PlayersPage(players), c)
+}
+
+func (h PlayerHandler) ShowPlayerInfo(c echo.Context) error {
+	playerId := c.Param("playerId")
+	if len(playerId) == 0 {
+		log.Printf("playerId not not found in params")
+		return c.String(500, "")
+	}
+	return nil
+}
+
+func (h PlayerHandler) BlockBuyEvt(c echo.Context) error {
+	return nil
 }
 
 type CreatePlayerReq struct {

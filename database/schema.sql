@@ -46,3 +46,17 @@ CREATE TABLE player_test_results (
     FOREIGN KEY (playerId) REFERENCES players (id),
     FOREIGN KEY (testResultId) REFERENCES test_results (id)
 );
+
+CREATE TABLE shop_items (
+    name varchar(255) PRIMARY KEY,
+    type varchar(255) NOT NULL
+);
+
+CREATE TABLE player_shop_items (
+    playerId varchar(255),
+    shopItem varchar(255),
+    count INTEGER NOT NULL check(count >= 0),
+    PRIMARY KEY (playerId, shopItem),
+    FOREIGN KEY (playerId) REFERENCES player (id),
+    FOREIGN KEY (shopItem) REFERENCES shop_items (name)
+);

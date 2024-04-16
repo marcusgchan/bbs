@@ -1,0 +1,13 @@
+package testevt
+
+import "github.com/marcusgchan/bbs/internal/sview"
+
+templ OnGoingPage() {
+	@sview.Base() {
+		<h1>The current test event is still ongoing or doesn't exist</h1>
+	}
+}
+
+templ OnGoingContent() {
+	<h1>The current test event is still ongoing or doesn't exist</h1>
+}

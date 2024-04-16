@@ -3,6 +3,7 @@ package testevt
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -29,18 +30,20 @@ func (h TestEventHandler) GetTestEvtPage(c echo.Context) error {
 	return internal.Render(views.TestEvtPage(TransformToTestEvtProps(data)), c)
 }
 
-type TestEvtResultsProps struct {
-	TestEvtID string `json:"testEventId"`
-}
-
 func (h TestEventHandler) GetTestEvtResPage(c echo.Context) error {
-	props := new(TestEvtResultsProps)
-	err := json.NewDecoder(c.Request().Body).Decode(props)
-	if err != nil {
-		return err
+	testEvtId := c.Param("testEventId")
+	if len(testEvtId) == 0 {
+		log.Printf("Missing query params testEventId")
+		return c.String(500, "")
 	}
 
-	evtData, err := h.Q.GetTestEvtResults(c.Request().Context(), props.TestEvtID)
+	evtData, err := h.Q.GetTestEvtResults(c.Request().Context(), testEvtId)
+	if err == sql.ErrNoRows {
+		if internal.FromHTMX(c) {
+			return internal.Render(views.OnGoingContent(), c)
+		}
+		return internal.Render(views.OnGoingPage(), c)
+	}
 	if err != nil {
 		return err
 	}

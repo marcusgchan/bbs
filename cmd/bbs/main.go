@@ -39,12 +39,13 @@ func main() {
 	testEventsGroup.Use(auth.Authenticated)
 	testEventsHandler := testevt.TestEventHandler{Q: q, DB: db}
 	testEventsGroup.GET("", testEventsHandler.GetTestEvtPage)
-	testEventsGroup.GET("/:testEventId", testEventsHandler.GetTestEvtPage)
+	testEventsGroup.GET("/:testEventId", testEventsHandler.GetTestEvtResPage)
 
 	playersGroup := app.Group("/players")
 	playersGroup.Use(auth.Authenticated)
 	playersHandler := player.PlayerHandler{Q: q, DB: db}
 	playersGroup.GET("", playersHandler.ShowPlayerList)
+	playersGroup.GET("/:playerId", playersHandler.ShowPlayerInfo)
 
 	app.GET("/*", func(c echo.Context) error {
 		return internal.Render(sview.NotFoundPage(), c)
