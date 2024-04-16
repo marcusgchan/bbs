@@ -27,7 +27,7 @@ func main() {
 	db := database.Connect()
 	q := slqc.New(db)
 
-	// app.Use(middleware.Logger())
+	app.Use(middleware.Logger())
 	app.Use(middleware.StaticWithConfig(middleware.StaticConfig{
 		Filesystem: http.FS(web.StaticFS),
 	}))
