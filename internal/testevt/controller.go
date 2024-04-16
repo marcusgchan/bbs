@@ -103,7 +103,7 @@ type CreateTemplateReq struct {
 	Name     string `json:"name"`
 	Data     string `json:"data"`
 	PlayerID string `json:"playerId"`
-	Date     string `json:"date"`
+	Date     int64  `json:"date"`
 }
 
 func (h TestEventHandler) CreateTemplate(c echo.Context) error {
@@ -112,7 +112,7 @@ func (h TestEventHandler) CreateTemplate(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	date, err := time.Parse(time.UnixDate, data.Date)
+	date := time.Unix(data.Date, 0)
 	if err != nil {
 		return err
 	}
