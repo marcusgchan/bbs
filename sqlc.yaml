@@ -4,6 +4,7 @@ sql:
       queries:
           - "./database/queries/testevt.sql"
           - "./database/queries/player.sql"
+          - "./database/queries/template.sql"
       schema: "./database/schema.sql"
       gen:
           go:

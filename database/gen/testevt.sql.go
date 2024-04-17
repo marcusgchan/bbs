@@ -11,31 +11,6 @@ import (
 	"time"
 )
 
-const createPlayerTemp = `-- name: CreatePlayerTemp :exec
-INSERT INTO templates (id, playerId, data, name, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?)
-`
-
-type CreatePlayerTempParams struct {
-	ID        string
-	Playerid  string
-	Data      string
-	Name      string
-	Createdat time.Time
-	Updatedat time.Time
-}
-
-func (q *Queries) CreatePlayerTemp(ctx context.Context, arg CreatePlayerTempParams) error {
-	_, err := q.db.ExecContext(ctx, createPlayerTemp,
-		arg.ID,
-		arg.Playerid,
-		arg.Data,
-		arg.Name,
-		arg.Createdat,
-		arg.Updatedat,
-	)
-	return err
-}
-
 const createPlayerTestResult = `-- name: CreatePlayerTestResult :exec
 INSERT INTO player_test_results (playerId, testResultId, waveDied, diedTo) VALUES (?, ?, ?, ?)
 `
