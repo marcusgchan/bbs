@@ -41,9 +41,9 @@ templ TestEvtContent(props []TestEvtProps) {
 					<td class="p-2">{ prop.Difficulty }</td>
 					<td class="p-2">{ prop.StartedAt }</td>
 					if prop.HasEnded {
-						<td>Ongoing</td>
-					} else {
 						<td>Finished</td>
+					} else {
+						<td>Ongoing</td>
 					}
 				</tr>
 			}
