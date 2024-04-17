@@ -12,10 +12,11 @@ import (
 )
 
 const createPlayerTemp = `-- name: CreatePlayerTemp :exec
-INSERT INTO templates (playerId, data, name, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?)
+INSERT INTO templates (id, playerId, data, name, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?)
 `
 
 type CreatePlayerTempParams struct {
+	ID        string
 	Playerid  string
 	Data      string
 	Name      string
@@ -25,6 +26,7 @@ type CreatePlayerTempParams struct {
 
 func (q *Queries) CreatePlayerTemp(ctx context.Context, arg CreatePlayerTempParams) error {
 	_, err := q.db.ExecContext(ctx, createPlayerTemp,
+		arg.ID,
 		arg.Playerid,
 		arg.Data,
 		arg.Name,

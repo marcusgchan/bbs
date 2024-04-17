@@ -5,7 +5,7 @@ SELECT * FROM users WHERE username = ?;
 INSERT INTO test_events (environment, templateId, difficulty, startedAt) VALUES (?, ?, ?, ?);
 
 -- name: CreatePlayerTemp :exec
-INSERT INTO templates (playerId, data, name, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?);
+INSERT INTO templates (id, playerId, data, name, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?);
 
 -- name: CreateTestResult :one
 INSERT INTO test_results (moneyEarned, endedAt) VALUES (?, ?) RETURNING id;

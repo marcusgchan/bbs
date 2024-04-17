@@ -113,10 +113,8 @@ func (h TestEventHandler) CreateTemplate(c echo.Context) error {
 		return err
 	}
 	date := time.Unix(data.Date, 0)
-	if err != nil {
-		return err
-	}
 	err = h.Q.CreatePlayerTemp(c.Request().Context(), database.CreatePlayerTempParams{
+		ID:        data.ID,
 		Playerid:  data.PlayerID,
 		Data:      data.Data,
 		Name:      data.Name,

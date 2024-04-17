@@ -9,11 +9,22 @@ import (
 	"time"
 )
 
+type Component struct {
+	Name string
+	Type string
+}
+
 type Player struct {
 	ID        string
 	Name      string
 	Createdat sql.NullTime
 	Updatedat sql.NullTime
+}
+
+type PlayerComponent struct {
+	Playerid  sql.NullString
+	Component sql.NullString
+	Count     int64
 }
 
 type PlayerTestResult struct {
