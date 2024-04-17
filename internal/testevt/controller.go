@@ -134,16 +134,12 @@ type CreateTestResultReq struct {
 	TestEvtID   string   `json:"testEvtId"`
 	MoneyEarned int64    `json:"moneyEarned"`
 	Players     []player `json:"players"`
-	Date        string   `json:"date"`
+	Date        int64    `json:"date"`
 }
 
 func (h TestEventHandler) CreatePlayerTestResult(c echo.Context) error {
 	data := new(CreateTestResultReq)
 	err := json.NewDecoder(c.Request().Body).Decode(data)
-	if err != nil {
-		return err
-	}
-	date, err := time.Parse(time.UnixDate, data.Date)
 	if err != nil {
 		return err
 	}
@@ -155,7 +151,7 @@ func (h TestEventHandler) CreatePlayerTestResult(c echo.Context) error {
 	// Create general test result
 	createdTestResId, err := h.Q.CreateTestResult(c.Request().Context(), database.CreateTestResultParams{
 		Moneyearned: data.MoneyEarned,
-		Endedat:     date,
+		Endedat:     time.Unix(data.Date, 0),
 	})
 	if err != nil {
 		return err
