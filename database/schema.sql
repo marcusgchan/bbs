@@ -26,7 +26,7 @@ CREATE TABLE test_events (
     environment varchar(255) NOT NULL,
     difficulty varchar(255) NOT NULL,
     templateId varchar(255) NOT NULL,
-    testResultId varchar(255),
+    testResultId INTEGER,
     startedAt DATETIME NOT NULL,
     FOREIGN KEY (templateId) REFERENCES templates (id),
     FOREIGN KEY (testResultId) REFERENCES test_results (id)
@@ -39,7 +39,7 @@ CREATE TABLE users(
 
 CREATE TABLE player_test_results (
     playerId varchar(255) NOT NULL,
-    testResultId varchar(255) NOT NULL,
+    testResultId INTEGER NOT NULL,
     waveDied INTEGER NOT NULL check(waveDied > 0),
     diedTo varchar(255) NOT NULL,
     PRIMARY KEY (playerId, testResultId),
