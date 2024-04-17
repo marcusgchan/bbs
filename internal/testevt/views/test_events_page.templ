@@ -31,10 +31,12 @@ templ TestEvtContent(props []TestEvtProps) {
 		<tbody>
 			for _, prop := range props {
 				<tr
-					hx-get={ string(templ.URL(fmt.Sprintf("/test-events/%s", prop.ID))) }
 					class="cursor-pointer hover:bg-gray-100"
-					hx-swap="innerHTML"
-					hx-target="main"
+					if prop.HasEnded {
+						hx-get={ string(templ.URL(fmt.Sprintf("/test-events/%s", prop.ID))) }
+						hx-swap="innerHTML"
+						hx-target="main"
+					}
 				>
 					<td class="p-2">{ prop.ID }</td>
 					<td class="p-2">{ prop.Environment }</td>
