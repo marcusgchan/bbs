@@ -67,16 +67,12 @@ type CreateTestEvtReq struct {
 	EnvironmentName string   `json:"environmentName"`
 	TemplateID      string   `json:"templateId"`
 	Difficulty      string   `json:"difficulty"`
-	Date            string   `json:"date"`
+	Date            int64    `json:"date"`
 }
 
 func (h TestEventHandler) CreateTestEvent(c echo.Context) error {
 	data := new(CreateTestEvtReq)
 	err := json.NewDecoder(c.Request().Body).Decode(data)
-	if err != nil {
-		return err
-	}
-	date, err := time.Parse(time.UnixDate, data.Date)
 	if err != nil {
 		return err
 	}
@@ -88,7 +84,7 @@ func (h TestEventHandler) CreateTestEvent(c echo.Context) error {
 	qtx := h.Q.WithTx(tx)
 	err = qtx.CreateTestEvt(c.Request().Context(), database.CreateTestEvtParams{
 		Environment: data.EnvironmentName,
-		Startedat:   date,
+		Startedat:   time.Unix(data.Date, 0),
 		Difficulty:  data.Difficulty,
 	})
 	if err != nil {
