@@ -29,7 +29,7 @@ type PlayerComponent struct {
 
 type PlayerTestResult struct {
 	Playerid     string
-	Testresultid int64
+	Testresultid string
 	Wavedied     int64
 	Diedto       string
 }
@@ -47,8 +47,8 @@ type TestEvent struct {
 	ID           string
 	Environment  string
 	Difficulty   string
-	Templateid   int64
-	Testresultid sql.NullInt64
+	Templateid   string
+	Testresultid sql.NullString
 	Startedat    time.Time
 }
 

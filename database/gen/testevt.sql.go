@@ -42,7 +42,7 @@ INSERT INTO player_test_results (playerId, testResultId, waveDied, diedTo) VALUE
 
 type CreatePlayerTestResultParams struct {
 	Playerid     string
-	Testresultid int64
+	Testresultid string
 	Wavedied     int64
 	Diedto       string
 }
@@ -58,18 +58,20 @@ func (q *Queries) CreatePlayerTestResult(ctx context.Context, arg CreatePlayerTe
 }
 
 const createTestEvt = `-- name: CreateTestEvt :exec
-INSERT INTO test_events (environment, templateId, difficulty, startedAt) VALUES (?, ?, ?, ?)
+INSERT INTO test_events (id, environment, templateId, difficulty, startedAt) VALUES (?, ?, ?, ?, ?)
 `
 
 type CreateTestEvtParams struct {
+	ID          string
 	Environment string
-	Templateid  int64
+	Templateid  string
 	Difficulty  string
 	Startedat   time.Time
 }
 
 func (q *Queries) CreateTestEvt(ctx context.Context, arg CreateTestEvtParams) error {
 	_, err := q.db.ExecContext(ctx, createTestEvt,
+		arg.ID,
 		arg.Environment,
 		arg.Templateid,
 		arg.Difficulty,
@@ -106,7 +108,7 @@ type GetTestEvtPlayerResultsRow struct {
 	Player           Player
 }
 
-func (q *Queries) GetTestEvtPlayerResults(ctx context.Context, testresultid int64) ([]GetTestEvtPlayerResultsRow, error) {
+func (q *Queries) GetTestEvtPlayerResults(ctx context.Context, testresultid string) ([]GetTestEvtPlayerResultsRow, error) {
 	rows, err := q.db.QueryContext(ctx, getTestEvtPlayerResults, testresultid)
 	if err != nil {
 		return nil, err
@@ -225,7 +227,7 @@ UPDATE test_events SET testResultId = ? WHERE id = ?
 `
 
 type UpdateTestEvtWithTestResParams struct {
-	Testresultid sql.NullInt64
+	Testresultid sql.NullString
 	ID           string
 }
 

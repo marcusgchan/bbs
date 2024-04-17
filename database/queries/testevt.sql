@@ -2,7 +2,7 @@
 SELECT * FROM users WHERE username = ?;
 
 -- name: CreateTestEvt :exec
-INSERT INTO test_events (environment, templateId, difficulty, startedAt) VALUES (?, ?, ?, ?);
+INSERT INTO test_events (id, environment, templateId, difficulty, startedAt) VALUES (?, ?, ?, ?, ?);
 
 -- name: CreatePlayerTemp :exec
 INSERT INTO templates (id, playerId, data, name, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?);

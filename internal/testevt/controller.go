@@ -83,6 +83,8 @@ func (h TestEventHandler) CreateTestEvent(c echo.Context) error {
 	defer tx.Rollback()
 	qtx := h.Q.WithTx(tx)
 	err = qtx.CreateTestEvt(c.Request().Context(), database.CreateTestEvtParams{
+		ID:          data.ID,
+		Templateid:  data.TemplateID,
 		Environment: data.EnvironmentName,
 		Startedat:   time.Unix(data.Date, 0),
 		Difficulty:  data.Difficulty,
