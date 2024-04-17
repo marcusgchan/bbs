@@ -96,34 +96,6 @@ func (h TestEventHandler) CreateTestEvent(c echo.Context) error {
 	return c.NoContent(204)
 }
 
-type CreateTemplateReq struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Data     string `json:"data"`
-	PlayerID string `json:"playerId"`
-	Date     int64  `json:"date"`
-}
-
-func (h TestEventHandler) CreateTemplate(c echo.Context) error {
-	data := new(CreateTemplateReq)
-	err := json.NewDecoder(c.Request().Body).Decode(data)
-	if err != nil {
-		return err
-	}
-	date := time.Unix(data.Date, 0)
-	err = h.Q.CreatePlayerTemp(c.Request().Context(), database.CreatePlayerTempParams{
-		ID:        data.ID,
-		Playerid:  data.PlayerID,
-		Data:      data.Data,
-		Name:      data.Name,
-		Createdat: date,
-	})
-	if err != nil {
-		return err
-	}
-	return c.NoContent(204)
-}
-
 type player struct {
 	ID       string `json:"id"`
 	WaveDied int64  `json:"waveDied"`

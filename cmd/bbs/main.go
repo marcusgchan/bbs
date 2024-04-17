@@ -14,6 +14,7 @@ import (
 	"github.com/marcusgchan/bbs/internal/auth"
 	"github.com/marcusgchan/bbs/internal/player"
 	"github.com/marcusgchan/bbs/internal/sview"
+	"github.com/marcusgchan/bbs/internal/template"
 	"github.com/marcusgchan/bbs/internal/testevt"
 	"github.com/marcusgchan/bbs/web"
 )
@@ -60,7 +61,8 @@ func main() {
 	playerApiGroup.POST("", playersHandler.CreatePlayer)
 
 	templateApiGroup := api.Group("/templates")
-	templateApiGroup.POST("", testEventsHandler.CreateTemplate)
+	templateHandler := template.TemplateHandler{Q: q, DB: db}
+	templateApiGroup.POST("", templateHandler.Create)
 
 	port := os.Getenv("PORT")
 	if port == "" {
