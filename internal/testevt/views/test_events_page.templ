@@ -6,11 +6,12 @@ import (
 )
 
 type TestEvtProps struct {
-	ID          string
-	Environment string
-	Difficulty  string
-	StartedAt   string
-	HasEnded    bool
+	ID             string
+	Environment    string
+	Difficulty     string
+	MainPlayerName string
+	StartedAt      string
+	HasEnded       bool
 }
 
 templ TestEvtPage(props []TestEvtProps) {
@@ -26,6 +27,7 @@ templ TestEvtContent(props []TestEvtProps) {
 			<th class="p-2 min-w-24 text-start">ID</th>
 			<th class="p-2 min-w-24 text-start">Environment</th>
 			<th class="p-2 min-w-24 text-start">Dificulty</th>
+			<th class="p-2 min-w-24 text-start">MainPlayer</th>
 			<th class="p-2 min-w-24 text-start">Started At</th>
 		</thead>
 		<tbody>
@@ -41,6 +43,7 @@ templ TestEvtContent(props []TestEvtProps) {
 					<td class="p-2">{ prop.ID }</td>
 					<td class="p-2">{ prop.Environment }</td>
 					<td class="p-2">{ prop.Difficulty }</td>
+					<td class="p-2">{ prop.MainPlayerName }</td>
 					<td class="p-2">{ prop.StartedAt }</td>
 					if prop.HasEnded {
 						<td>Finished</td>

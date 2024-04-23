@@ -153,18 +153,30 @@ func (q *Queries) GetTestEvtResults(ctx context.Context, id string) (GetTestEvtR
 }
 
 const getTestEvts = `-- name: GetTestEvts :many
-SELECT id, environment, difficulty, templateid, testresultid, startedat FROM test_events
+SELECT test_events.id, test_events.environment, test_events.difficulty, test_events.templateid, test_events.testresultid, test_events.startedat, players.name as mainPlayer FROM test_events
+JOIN templates ON templates.id = test_events.templateId
+JOIN players ON players.id = templates.playerId
 `
 
-func (q *Queries) GetTestEvts(ctx context.Context) ([]TestEvent, error) {
+type GetTestEvtsRow struct {
+	ID           string
+	Environment  string
+	Difficulty   string
+	Templateid   string
+	Testresultid sql.NullInt64
+	Startedat    time.Time
+	Mainplayer   string
+}
+
+func (q *Queries) GetTestEvts(ctx context.Context) ([]GetTestEvtsRow, error) {
 	rows, err := q.db.QueryContext(ctx, getTestEvts)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []TestEvent
+	var items []GetTestEvtsRow
 	for rows.Next() {
-		var i TestEvent
+		var i GetTestEvtsRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Environment,
@@ -172,6 +184,7 @@ func (q *Queries) GetTestEvts(ctx context.Context) ([]TestEvent, error) {
 			&i.Templateid,
 			&i.Testresultid,
 			&i.Startedat,
+			&i.Mainplayer,
 		); err != nil {
 			return nil, err
 		}

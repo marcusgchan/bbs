@@ -8,16 +8,17 @@ import (
 	"github.com/marcusgchan/bbs/internal/testevt/views"
 )
 
-func TransformToTestEvtProps(data []database.TestEvent) []testevt.TestEvtProps {
+func TransformToTestEvtProps(data []database.GetTestEvtsRow) []testevt.TestEvtProps {
 	length := len(data)
 	mappedData := make([]testevt.TestEvtProps, length)
 	for i, d := range data {
 		mappedData[i] = testevt.TestEvtProps{
-			ID:          d.ID,
-			Environment: d.Environment,
-			Difficulty:  d.Difficulty,
-			StartedAt:   d.Startedat.String(),
-			HasEnded:    d.Testresultid.Valid,
+			ID:             d.ID,
+			Environment:    d.Environment,
+			Difficulty:     d.Difficulty,
+			MainPlayerName: d.Mainplayer,
+			StartedAt:      d.Startedat.String(),
+			HasEnded:       d.Testresultid.Valid,
 		}
 	}
 	return mappedData
