@@ -2,9 +2,7 @@ version: "2"
 sql:
     - engine: "sqlite"
       queries:
-          - "./database/queries/testevt.sql"
-          - "./database/queries/player.sql"
-          - "./database/queries/template.sql"
+          - "./database/queries/"
       schema: "./database/schema.sql"
       gen:
           go:
