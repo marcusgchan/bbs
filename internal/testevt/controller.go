@@ -19,7 +19,7 @@ type TestEventHandler struct {
 }
 
 func (h TestEventHandler) GetTestEvtPage(c echo.Context) error {
-	const pageSize = 1
+	const pageSize = 20
 	page, err := strconv.Atoi(c.QueryParam("page"))
 	if err != nil {
 		page = 1
