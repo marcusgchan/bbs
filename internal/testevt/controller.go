@@ -18,7 +18,7 @@ type TestEventHandler struct {
 	DB *sql.DB
 }
 
-func (h TestEventHandler) GetTestEvtPage(c echo.Context) error {
+func (h TestEventHandler) TestEvtPage(c echo.Context) error {
 	const pageSize = 20
 	page, err := strconv.Atoi(c.QueryParam("page"))
 	if err != nil {
@@ -62,7 +62,7 @@ func (h TestEventHandler) GetTestEvtPage(c echo.Context) error {
 	return internal.Render(views.TestEvtPage(TransformToTestEvtProps(data), page+1), c)
 }
 
-func (h TestEventHandler) GetTestEvtResPage(c echo.Context) error {
+func (h TestEventHandler) TestEvtResPage(c echo.Context) error {
 	testEvtId := c.Param("testEventId")
 	if len(testEvtId) == 0 {
 		log.Printf("Missing query params testEventId")

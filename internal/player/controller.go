@@ -18,7 +18,7 @@ type PlayerHandler struct {
 	DB *sql.DB
 }
 
-func (h PlayerHandler) ShowPlayerList(c echo.Context) error {
+func (h PlayerHandler) PlayerListPage(c echo.Context) error {
 	const pageSize = 20
 	page, err := strconv.Atoi(c.QueryParam("page"))
 	if err != nil {
@@ -64,7 +64,7 @@ func (h PlayerHandler) ShowPlayerList(c echo.Context) error {
 	return internal.Render(player.PlayersPage(TransformToPlayerProps(data), page+1), c)
 }
 
-func (h PlayerHandler) ShowPlayerInfo(c echo.Context) error {
+func (h PlayerHandler) PlayerInfoPage(c echo.Context) error {
 	playerId := c.Param("playerId")
 	if len(playerId) == 0 {
 		log.Printf("playerId not not found in params")
