@@ -14,9 +14,12 @@ UPDATE test_events SET testResultId = ? WHERE id = ?;
 INSERT INTO player_test_results (playerId, testResultId, waveDied, diedTo) VALUES (?, ?, ?, ?);
 
 -- name: GetTestEvts :many
-SELECT test_events.*, players.name as mainPlayer FROM test_events
+SELECT test_events.*, players.name as mainPlayer 
+FROM test_events
 JOIN templates ON templates.id = test_events.templateId
-JOIN players ON players.id = templates.playerId;
+JOIN players ON players.id = templates.playerId
+ORDER BY test_events.startedAt DESC
+LIMIT ? OFFSET ?;
 
 -- name: GetTestEvtResults :one
 SELECT sqlc.embed(test_events), sqlc.embed(test_results), sqlc.embed(templates)

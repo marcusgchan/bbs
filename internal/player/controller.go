@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 	database "github.com/marcusgchan/bbs/database/gen"
@@ -18,24 +19,49 @@ type PlayerHandler struct {
 }
 
 func (h PlayerHandler) ShowPlayerList(c echo.Context) error {
-	data, err := h.Q.GetPlayers(c.Request().Context())
+	const pageSize = 20
+	page, err := strconv.Atoi(c.QueryParam("page"))
+	if err != nil {
+		page = 1
+	}
+	if internal.FromHTMX(c) {
+		if infinite := c.QueryParam("infinite"); infinite != "true" {
+			limit := pageSize
+			offset := 0
+			data, err := h.Q.GetPlayers(c.Request().Context(), database.GetPlayersParams{
+				Offset: int64(offset),
+				Limit:  int64(limit),
+			})
+			if err != nil {
+				return err
+			}
+
+			return internal.Render(player.PlayersContent(TransformToPlayerProps(data), page+1), c)
+		}
+
+		limit := pageSize
+		offset := (page - 1) * pageSize
+		data, err := h.Q.GetPlayers(c.Request().Context(), database.GetPlayersParams{
+			Offset: int64(offset),
+			Limit:  int64(limit),
+		})
+		if err != nil {
+			return err
+		}
+
+		return internal.Render(player.PlayerRows(TransformToPlayerProps(data), page+1), c)
+	}
+
+	limit := pageSize
+	offset := 0
+	data, err := h.Q.GetPlayers(c.Request().Context(), database.GetPlayersParams{
+		Offset: int64(offset),
+		Limit:  int64(limit),
+	})
 	if err != nil {
 		return err
 	}
-
-	players := make([]player.PlayerProps, len(data))
-	for i, d := range data {
-		players[i] = player.PlayerProps{
-			ID:   d.ID,
-			Name: d.Name,
-		}
-	}
-
-	if internal.FromHTMX(c) {
-		return internal.Render(player.PlayersContent(players), c)
-	}
-
-	return internal.Render(player.PlayersPage(players), c)
+	return internal.Render(player.PlayersPage(TransformToPlayerProps(data), page+1), c)
 }
 
 func (h PlayerHandler) ShowPlayerInfo(c echo.Context) error {

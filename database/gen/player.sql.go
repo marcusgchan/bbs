@@ -25,10 +25,17 @@ func (q *Queries) CreatePlayer(ctx context.Context, arg CreatePlayerParams) erro
 
 const getPlayers = `-- name: GetPlayers :many
 SELECT id, name, createdat, updatedat FROM players
+ORDER BY updatedAt DESC
+LIMIT ? OFFSET ?
 `
 
-func (q *Queries) GetPlayers(ctx context.Context) ([]Player, error) {
-	rows, err := q.db.QueryContext(ctx, getPlayers)
+type GetPlayersParams struct {
+	Limit  int64
+	Offset int64
+}
+
+func (q *Queries) GetPlayers(ctx context.Context, arg GetPlayersParams) ([]Player, error) {
+	rows, err := q.db.QueryContext(ctx, getPlayers, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}

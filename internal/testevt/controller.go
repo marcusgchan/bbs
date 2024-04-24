@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -18,15 +19,34 @@ type TestEventHandler struct {
 }
 
 func (h TestEventHandler) GetTestEvtPage(c echo.Context) error {
-	data, err := h.Q.GetTestEvts(c.Request().Context())
+	const pageSize = 5
+	page, err := strconv.Atoi(c.QueryParam("page"))
 	if err != nil {
-		return err
+		page = 1
 	}
 
 	if internal.FromHTMX(c) {
+		limit := pageSize
+		offset := (page - 1) * limit
+		data, err := h.Q.GetTestEvts(c.Request().Context(), database.GetTestEvtsParams{
+			Limit:  int64(limit),
+			Offset: int64(offset),
+		})
+		if err != nil {
+			return err
+		}
 		return internal.Render(views.TestEvtContent(TransformToTestEvtProps(data)), c)
 	}
 
+	limit := pageSize * page
+	offset := 0
+	data, err := h.Q.GetTestEvts(c.Request().Context(), database.GetTestEvtsParams{
+		Limit:  int64(limit),
+		Offset: int64(offset),
+	})
+	if err != nil {
+		return err
+	}
 	return internal.Render(views.TestEvtPage(TransformToTestEvtProps(data)), c)
 }
 

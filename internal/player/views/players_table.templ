@@ -1,24 +1,27 @@
 package player
 
-import "github.com/marcusgchan/bbs/internal/sview"
+import (
+	"github.com/marcusgchan/bbs/internal/sview"
+	"fmt"
+)
 
 type PlayerProps struct {
 	ID   string
 	Name string
 }
 
-templ PlayersPage(players []PlayerProps) {
+templ PlayersPage(players []PlayerProps, nextPage int) {
 	@sview.Base() {
-		@PlayersContent(players)
+		@PlayersContent(players, nextPage)
 	}
 }
 
-templ PlayersContent(players []PlayerProps) {
+templ PlayersContent(players []PlayerProps, nextPage int) {
 	<h1 class="text-xl">Players</h1>
-	@PlayersTable(players)
+	@PlayersTable(players, nextPage)
 }
 
-templ PlayersTable(players []PlayerProps) {
+templ PlayersTable(players []PlayerProps, nextPage int) {
 	<table class="w-full">
 		<thead>
 			<tr>
@@ -27,12 +30,33 @@ templ PlayersTable(players []PlayerProps) {
 			</tr>
 		</thead>
 		<tbody>
-			for _, player := range players {
-				<tr>
+			for i, player := range players {
+				<tr
+					if i == len(players) - 1 {
+						hx-get={ string(templ.URL(fmt.Sprintf("/players?infinite=true&page=%d", nextPage))) }
+						hx-trigger="revealed"
+						hx-swap="afterend"
+					}
+				>
 					<td>{ player.ID }</td>
 					<td>{ player.Name }</td>
 				</tr>
 			}
 		</tbody>
 	</table>
+}
+
+templ PlayerRows(players []PlayerProps, nextPage int) {
+	for i, player := range players {
+		<tr
+			if i == len(players) - 1 {
+				hx-get={ string(templ.URL(fmt.Sprintf("/players?infinite=true&page=%d", nextPage))) }
+				hx-trigger="revealed"
+				hx-swap="afterend"
+			}
+		>
+			<td>{ player.ID }</td>
+			<td>{ player.Name }</td>
+		</tr>
+	}
 }

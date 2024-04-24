@@ -153,10 +153,18 @@ func (q *Queries) GetTestEvtResults(ctx context.Context, id string) (GetTestEvtR
 }
 
 const getTestEvts = `-- name: GetTestEvts :many
-SELECT test_events.id, test_events.environment, test_events.difficulty, test_events.templateid, test_events.testresultid, test_events.startedat, players.name as mainPlayer FROM test_events
+SELECT test_events.id, test_events.environment, test_events.difficulty, test_events.templateid, test_events.testresultid, test_events.startedat, players.name as mainPlayer 
+FROM test_events
 JOIN templates ON templates.id = test_events.templateId
 JOIN players ON players.id = templates.playerId
+ORDER BY test_events.startedAt DESC
+LIMIT ? OFFSET ?
 `
+
+type GetTestEvtsParams struct {
+	Limit  int64
+	Offset int64
+}
 
 type GetTestEvtsRow struct {
 	ID           string
@@ -168,8 +176,8 @@ type GetTestEvtsRow struct {
 	Mainplayer   string
 }
 
-func (q *Queries) GetTestEvts(ctx context.Context) ([]GetTestEvtsRow, error) {
-	rows, err := q.db.QueryContext(ctx, getTestEvts)
+func (q *Queries) GetTestEvts(ctx context.Context, arg GetTestEvtsParams) ([]GetTestEvtsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getTestEvts, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
