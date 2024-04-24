@@ -19,13 +19,25 @@ type TestEventHandler struct {
 }
 
 func (h TestEventHandler) GetTestEvtPage(c echo.Context) error {
-	const pageSize = 5
+	const pageSize = 1
 	page, err := strconv.Atoi(c.QueryParam("page"))
 	if err != nil {
 		page = 1
 	}
 
 	if internal.FromHTMX(c) {
+		if infinite := c.QueryParam("infinite"); infinite != "true" {
+			limit := pageSize
+			offset := 0
+			data, err := h.Q.GetTestEvts(c.Request().Context(), database.GetTestEvtsParams{
+				Limit:  int64(limit),
+				Offset: int64(offset),
+			})
+			if err != nil {
+				return err
+			}
+			return internal.Render(views.TestEvtContent(TransformToTestEvtProps(data), page+1), c)
+		}
 		limit := pageSize
 		offset := (page - 1) * limit
 		data, err := h.Q.GetTestEvts(c.Request().Context(), database.GetTestEvtsParams{
@@ -35,7 +47,7 @@ func (h TestEventHandler) GetTestEvtPage(c echo.Context) error {
 		if err != nil {
 			return err
 		}
-		return internal.Render(views.TestEvtContent(TransformToTestEvtProps(data)), c)
+		return internal.Render(views.TestEvtRows(TransformToTestEvtProps(data), page+1), c)
 	}
 
 	limit := pageSize * page
@@ -47,7 +59,7 @@ func (h TestEventHandler) GetTestEvtPage(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return internal.Render(views.TestEvtPage(TransformToTestEvtProps(data)), c)
+	return internal.Render(views.TestEvtPage(TransformToTestEvtProps(data), page+1), c)
 }
 
 func (h TestEventHandler) GetTestEvtResPage(c echo.Context) error {

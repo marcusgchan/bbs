@@ -14,13 +14,13 @@ type TestEvtProps struct {
 	HasEnded       bool
 }
 
-templ TestEvtPage(props []TestEvtProps) {
+templ TestEvtPage(props []TestEvtProps, nextPage int) {
 	@sview.Base() {
-		@TestEvtContent(props)
+		@TestEvtContent(props, nextPage)
 	}
 }
 
-templ TestEvtContent(props []TestEvtProps) {
+templ TestEvtContent(props []TestEvtProps, nextPage int) {
 	<h1 class="text-xl">Test Events</h1>
 	<table class="w-full">
 		<thead>
@@ -31,27 +31,39 @@ templ TestEvtContent(props []TestEvtProps) {
 			<th class="p-2 min-w-24 text-start">Started At</th>
 		</thead>
 		<tbody>
-			for _, prop := range props {
-				<tr
-					class="cursor-pointer hover:bg-gray-100"
-					if prop.HasEnded {
-						hx-get={ string(templ.URL(fmt.Sprintf("/test-events/%s", prop.ID))) }
-						hx-swap="innerHTML"
-						hx-target="main"
-					}
-				>
-					<td class="p-2">{ prop.ID }</td>
-					<td class="p-2">{ prop.Environment }</td>
-					<td class="p-2">{ prop.Difficulty }</td>
-					<td class="p-2">{ prop.MainPlayerName }</td>
-					<td class="p-2">{ prop.StartedAt }</td>
-					if prop.HasEnded {
-						<td>Finished</td>
-					} else {
-						<td>Ongoing</td>
-					}
-				</tr>
-			}
+			@TestEvtRows(props, nextPage)
 		</tbody>
 	</table>
+}
+
+templ TestEvtRows(props []TestEvtProps, nextPage int) {
+	for i, prop := range props {
+		<tr
+			class="cursor-pointer hover:bg-gray-100"
+			if prop.HasEnded {
+				hx-get={ string(templ.URL(fmt.Sprintf("/test-events/%s", prop.ID))) }
+				hx-swap="innerHTML"
+				hx-target="main"
+			}
+		>
+			<td
+				class="p-2"
+				if i == len(props) - 1 {
+					hx-get={ string(templ.URL(fmt.Sprintf("/test-events?infinite=true&page=%d", nextPage))) }
+					hx-swap="afterend"
+					hx-trigger="revealed"
+					hx-target="closest tr"
+				}
+			>{ prop.ID }</td>
+			<td class="p-2">{ prop.Environment }</td>
+			<td class="p-2">{ prop.Difficulty }</td>
+			<td class="p-2">{ prop.MainPlayerName }</td>
+			<td class="p-2">{ prop.StartedAt }</td>
+			if prop.HasEnded {
+				<td>Finished</td>
+			} else {
+				<td>Ongoing</td>
+			}
+		</tr>
+	}
 }

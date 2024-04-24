@@ -30,18 +30,7 @@ templ PlayersTable(players []PlayerProps, nextPage int) {
 			</tr>
 		</thead>
 		<tbody>
-			for i, player := range players {
-				<tr
-					if i == len(players) - 1 {
-						hx-get={ string(templ.URL(fmt.Sprintf("/players?infinite=true&page=%d", nextPage))) }
-						hx-trigger="revealed"
-						hx-swap="afterend"
-					}
-				>
-					<td>{ player.ID }</td>
-					<td>{ player.Name }</td>
-				</tr>
-			}
+			@PlayerRows(players, nextPage)
 		</tbody>
 	</table>
 }
