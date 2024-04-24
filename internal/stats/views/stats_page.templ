@@ -1,0 +1,56 @@
+package stats
+
+import "github.com/marcusgchan/bbs/internal/sview"
+
+templ StatsPage() {
+	@sview.Base() {
+		@StatsContent()
+	}
+}
+
+templ StatsContent() {
+	<h1 class="text-xl">Statistics</h1>
+	<div class="flex gap-2 justify-between flex-wrap-reverse">
+		<section class="space-y-2 flex-1">
+			<form class="flex gap-2 justify-between">
+				<div class="flex gap-2">
+					<div class="grid">
+						<label>Start Date:</label>
+						<input type="datetime-local" required/>
+					</div>
+					<div class="grid">
+						<label>End Date:</label>
+						<input type="datetime-local" required/>
+					</div>
+				</div>
+				<button>Search</button>
+			</form>
+			<h2 class="text-lg">Filtered Results</h2>
+			<div>
+				<p>Avg wave survived: 80</p>
+				<p>Highest wave survived: 80</p>
+				<p>Number of test events: 100</p>
+			</div>
+		</section>
+		<section>
+			<h2 class="text-lg">Last 3</h2>
+			<ul class="space-y-2">
+				<li>
+					<p>Avg wave survived: 80</p>
+					<p>Highest wave survived: 80</p>
+					<p>Number of test events: 100</p>
+				</li>
+				<li>
+					<p>Avg wave survived: 80</p>
+					<p>Highest wave survived: 80</p>
+					<p>Number of test events: 100</p>
+				</li>
+				<li>
+					<p>Avg wave survived: 80</p>
+					<p>Highest wave survived: 80</p>
+					<p>Number of test events: 100</p>
+				</li>
+			</ul>
+		</section>
+	</div>
+}
