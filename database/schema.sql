@@ -22,7 +22,8 @@ CREATE TABLE test_results (
 );
 
 CREATE TABLE versions (
-    value varchar(10) PRIMARY KEY
+    value varchar(10) PRIMARY KEY,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE test_events (

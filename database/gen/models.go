@@ -70,5 +70,6 @@ type User struct {
 }
 
 type Version struct {
-	Value string
+	Value     string
+	Createdat sql.NullTime
 }
