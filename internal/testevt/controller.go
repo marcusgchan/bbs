@@ -99,6 +99,7 @@ type CreateTestEvtReq struct {
 	EnvironmentName string   `json:"environmentName"`
 	TemplateID      string   `json:"templateId"`
 	Difficulty      string   `json:"difficulty"`
+	Version         string   `json:"version"`
 	Date            int64    `json:"date"`
 }
 
@@ -114,11 +115,16 @@ func (h TestEventHandler) CreateTestEvent(c echo.Context) error {
 	}
 	defer tx.Rollback()
 	qtx := h.Q.WithTx(tx)
+	err = qtx.CreateVersion(c.Request().Context(), data.Version)
+	if err != nil {
+		return err
+	}
 	err = qtx.CreateTestEvt(c.Request().Context(), database.CreateTestEvtParams{
 		ID:          data.ID,
 		Templateid:  data.TemplateID,
 		Environment: data.EnvironmentName,
 		Startedat:   time.Unix(data.Date, 0),
+		Version:     data.Version,
 		Difficulty:  data.Difficulty,
 	})
 	if err != nil {

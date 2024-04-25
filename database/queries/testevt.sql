@@ -2,13 +2,16 @@
 SELECT * FROM users WHERE username = ?;
 
 -- name: CreateTestEvt :exec
-INSERT INTO test_events (id, environment, templateId, difficulty, startedAt) VALUES (?, ?, ?, ?, ?);
+INSERT INTO test_events (id, environment, templateId, difficulty, version, startedAt) VALUES (?, ?, ?, ?, ?, ?);
 
 -- name: CreatePlayerTestEvt :exec
 INSERT INTO player_test_events (playerId, testEventId) values (?, ?);
 
 -- name: CreateTestResult :one
 INSERT INTO test_results (moneyEarned, endedAt) VALUES (?, ?) RETURNING id;
+
+-- name: CreateVersion :exec
+INSERT OR IGNORE INTO versions (value) VALUES (?);
 
 -- name: UpdateTestEvtWithTestRes :exec
 UPDATE test_events SET testResultId = ? WHERE id = ?;
