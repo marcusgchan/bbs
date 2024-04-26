@@ -8,6 +8,7 @@ package database
 import (
 	"context"
 	"database/sql"
+	"time"
 )
 
 const getMostRecentStats = `-- name: GetMostRecentStats :many
@@ -25,7 +26,7 @@ SELECT Avg.version, Avg.avgWave, Max.maxWave, Count.numOfTestEvents, StartDate.s
     WHERE test_events.testResultId IS NOT NULL
     GROUP BY test_events.version
 ) as Avg, (
-    SELECT test_events.version, MAX(player_test_results.waveDied) as maxWave
+    SELECT test_events.version, CAST(MAX(player_test_results.waveDied) AS INTEGER) as maxWave
     FROM (
         SELECT version, testResultId FROM test_events
         WHERE test_events.testResultId IS NOT NULL
@@ -48,7 +49,7 @@ SELECT Avg.version, Avg.avgWave, Max.maxWave, Count.numOfTestEvents, StartDate.s
     WHERE test_events.testResultId IS NOT NULL
     GROUP BY test_events.version
 ) as Count, (
-    SELECT test_events.version, MIN(test_events.startedAt) as startDate
+    SELECT test_events.version, CAST(MIN(test_events.startedAt) AS DATETIME) as startDate
     FROM (
         SELECT version, testResultId FROM test_events
         WHERE test_events.testResultId IS NOT NULL
@@ -60,7 +61,7 @@ SELECT Avg.version, Avg.avgWave, Max.maxWave, Count.numOfTestEvents, StartDate.s
     WHERE test_events.testResultId IS NOT NULL
     GROUP BY test_events.version
 ) as StartDate, (
-    SELECT test_events.version, MAX(test_results.endedAt) as endDate
+    SELECT test_events.version, CAST(MAX(test_results.endedAt) AS DATETIME) as endDate
     FROM (
         SELECT version, testResultId FROM test_events
         WHERE test_events.testResultId IS NOT NULL
@@ -90,10 +91,10 @@ type GetMostRecentStatsParams struct {
 type GetMostRecentStatsRow struct {
 	Version         string
 	Avgwave         sql.NullFloat64
-	Maxwave         interface{}
+	Maxwave         int64
 	Numoftestevents int64
-	Startdate       interface{}
-	Enddate         interface{}
+	Startdate       time.Time
+	Enddate         time.Time
 }
 
 func (q *Queries) GetMostRecentStats(ctx context.Context, arg GetMostRecentStatsParams) ([]GetMostRecentStatsRow, error) {
@@ -140,7 +141,7 @@ FROM (
     JOIN player_test_results ON player_test_results.testResultId = test_events.testResultId
     WHERE test_events.testResultId IS NOT NULL AND test_events.version = ?
 ) as Avg, (
-    SELECT test_events.version, MAX(player_test_results.waveDied) as maxWave
+    SELECT test_events.version, CAST(MAX(player_test_results.waveDied) AS INTEGER) as maxWave
     FROM test_events
     JOIN player_test_results ON player_test_results.testResultId = test_events.testResultId
     WHERE test_events.testResultId IS NOT NULL AND test_events.version = ?
@@ -149,13 +150,13 @@ FROM (
     FROM test_events
     WHERE test_events.testResultId IS NOT NULL AND test_events.version = ?
 ) as Count, (
-    SELECT test_events.version, MIN(test_events.startedAt) as startDate
+    SELECT test_events.version, CAST(MIN(test_events.startedAt) AS DATETIME) as startDate
     FROM test_events
     WHERE test_events.testResultId IS NOT NULL AND test_events.version = ?
 ) as StartDate, (
-    SELECT test_events.version, MAX(test_events.endedAt) as endDate
+    SELECT test_events.version, CAST(MAX(test_results.endedAt) AS DATETIME) as endDate
     FROM test_events
-    JOIN test_results ON test_events.testResultId = test_result.id
+    JOIN test_results ON test_events.testResultId = test_results.id
     WHERE test_events.testResultId IS NOT NULL AND test_events.version = ?
 ) as EndDate
 WHERE Avg.version = Max.version 
@@ -175,10 +176,10 @@ type GetStatsByVersionParams struct {
 type GetStatsByVersionRow struct {
 	Version         string
 	Avgwave         sql.NullFloat64
-	Maxwave         interface{}
+	Maxwave         int64
 	Numoftestevents int64
-	Startdate       interface{}
-	Enddate         interface{}
+	Startdate       time.Time
+	Enddate         time.Time
 }
 
 func (q *Queries) GetStatsByVersion(ctx context.Context, arg GetStatsByVersionParams) (GetStatsByVersionRow, error) {
