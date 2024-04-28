@@ -36,7 +36,7 @@ SELECT Avg.version, Avg.avgWave, Max.maxWave, Count.numOfTestEvents, StartDate.s
     WHERE test_events.testResultId IS NOT NULL
     GROUP BY test_events.version
 ) as Count, (
-    SELECT test_events.version, CAST(MIN(test_events.startedAt) AS DATETIME) as startDate
+    SELECT test_events.version, CAST(MIN(test_events.startedAt) as TEXT) as startDate
     FROM (
         SELECT version, testResultId FROM test_events
         WHERE test_events.testResultId IS NOT NULL
@@ -48,7 +48,7 @@ SELECT Avg.version, Avg.avgWave, Max.maxWave, Count.numOfTestEvents, StartDate.s
     WHERE test_events.testResultId IS NOT NULL
     GROUP BY test_events.version
 ) as StartDate, (
-    SELECT test_events.version, CAST(MAX(test_results.endedAt) AS DATETIME) as endDate
+    SELECT test_events.version, CAST(MAX(test_results.endedAt) as TEXT) as endDate
     FROM (
         SELECT version, testResultId FROM test_events
         WHERE test_events.testResultId IS NOT NULL
