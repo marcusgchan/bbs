@@ -164,9 +164,12 @@ func (h TestEventHandler) CreatePlayerTestResult(c echo.Context) error {
 		Testresultid: sql.NullInt64{Int64: createdTestResId, Valid: true},
 		ID:           data.TestEvtID,
 	})
+	if err != nil {
+		return err
+	}
 	for _, p := range data.Players {
 		// Create player test result
-		h.Q.CreatePlayerTestResult(c.Request().Context(), database.CreatePlayerTestResultParams{
+		err = h.Q.CreatePlayerTestResult(c.Request().Context(), database.CreatePlayerTestResultParams{
 			Playerid:      p.ID,
 			Testresultid:  createdTestResId,
 			Wavessurvived: p.WavesSurvived,
