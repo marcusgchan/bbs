@@ -41,101 +41,101 @@ func (t MockCtx) Value(str any) any {
 	return nil
 }
 
-// func TestMostRecentStatsWithNoContent(t *testing.T) {
-// 	tempDir := t.TempDir()
-// 	dbRelPath := "./test-db.db"
-// 	conStr := "file:" + path.Join(tempDir, dbRelPath)
-// 	createTables(tempDir, dbRelPath)
-//
-// 	db, err := sql.Open("libsql", conStr)
-// 	if err != nil {
-// 		fmt.Fprintf(os.Stderr, "failed to open db %s", err)
-// 		os.Exit(1)
-// 	}
-// 	defer db.Close()
-// 	q := sqlc.New(db)
-//
-// 	mc := MockCtx{}
-//
-// 	t.Run("it should return empty array - limit 5", func(t *testing.T) {
-// 		limit := int64(5)
-// 		data, err := q.GetMostRecentStats(mc, database.GetMostRecentStatsParams{
-// 			Limit:   limit,
-// 			Limit_2: limit,
-// 			Limit_3: limit,
-// 			Limit_4: limit,
-// 			Limit_5: limit,
-// 		})
-// 		if err != nil {
-// 			fmt.Fprintf(os.Stderr, "failed to execute query %s", err)
-// 			os.Exit(1)
-// 		}
-// 		if len(data) != 0 {
-// 			t.Fail()
-// 		}
-// 	})
-// }
+func TestMostRecentStatsWithNoContent(t *testing.T) {
+	tempDir := t.TempDir()
+	dbRelPath := "./test-db.db"
+	conStr := "file:" + path.Join(tempDir, dbRelPath)
+	createTables(tempDir, dbRelPath)
 
-// func TestMostRecentStatsWithTestEventButNoTestResult(t *testing.T) {
-// 	tempDir := t.TempDir()
-// 	dbRelPath := "./test-db.db"
-// 	conStr := "file:" + path.Join(tempDir, dbRelPath)
-// 	createTables(tempDir, dbRelPath)
-//
-// 	db, err := sql.Open("libsql", conStr)
-// 	if err != nil {
-// 		fmt.Fprintf(os.Stderr, "failed to open db %s", err)
-// 		os.Exit(1)
-// 	}
-// 	defer db.Close()
-// 	q := sqlc.New(db)
-//
-// 	mc := MockCtx{}
-//
-// 	tx, err := db.Begin()
-// 	if err != nil {
-// 		fmt.Println("Unable to start transaction")
-// 		os.Exit(1)
-// 	}
-//
-// 	tx.Query("insert into versions (version) values (1.0.0)")
-// 	tx.Query("insert into versions (version) values (2.0.0)")
-// 	tx.Query("insert into versions (version) values (3.0.0)")
-//
-// 	tx.Query("insert into players (id, name) values ('1', 'marcus')")
-//
-// 	tx.Query(`
-//         insert into templates (id playerId, data, name, createdAt, updatedAt) values
-//         ("1", "1", "", "A", '20120618 10:34:09 AM', '20120618 10:34:09 AM')
-//     `)
-//
-// 	tx.Query(`
-//         insert into test_events
-//         (id, environment, difficulty, templateId, startedAt, version) values
-//         ("1", "lab", "normal", " ",'20120618 10:34:09 AM', "1.0.0")
-//     `)
-//
-// 	tx.Commit()
-//
-// 	t.Run("it should return empty array", func(t *testing.T) {
-// 		limit := int64(1)
-// 		data, err := q.GetMostRecentStats(mc, database.GetMostRecentStatsParams{
-// 			Limit:   limit,
-// 			Limit_2: limit,
-// 			Limit_3: limit,
-// 			Limit_4: limit,
-// 			Limit_5: limit,
-// 		})
-// 		if err != nil {
-// 			fmt.Fprintf(os.Stderr, "failed to execute query %s", err)
-// 			os.Exit(1)
-// 		}
-//
-// 		if len(data) != 0 {
-// 			t.Fail()
-// 		}
-// 	})
-// }
+	db, err := sql.Open("libsql", conStr)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to open db %s", err)
+		os.Exit(1)
+	}
+	defer db.Close()
+	q := sqlc.New(db)
+
+	mc := MockCtx{}
+
+	t.Run("it should return empty array - limit 5", func(t *testing.T) {
+		limit := int64(5)
+		data, err := q.GetMostRecentStats(mc, database.GetMostRecentStatsParams{
+			Limit:   limit,
+			Limit_2: limit,
+			Limit_3: limit,
+			Limit_4: limit,
+			Limit_5: limit,
+		})
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "failed to execute query %s", err)
+			os.Exit(1)
+		}
+		if len(data) != 0 {
+			t.Fail()
+		}
+	})
+}
+
+func TestMostRecentStatsWithTestEventButNoTestResult(t *testing.T) {
+	tempDir := t.TempDir()
+	dbRelPath := "./test-db.db"
+	conStr := "file:" + path.Join(tempDir, dbRelPath)
+	createTables(tempDir, dbRelPath)
+
+	db, err := sql.Open("libsql", conStr)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to open db %s", err)
+		os.Exit(1)
+	}
+	defer db.Close()
+	q := sqlc.New(db)
+
+	mc := MockCtx{}
+
+	tx, err := db.Begin()
+	if err != nil {
+		fmt.Println("Unable to start transaction")
+		os.Exit(1)
+	}
+
+	tx.Query("insert into versions (version) values (1.0.0)")
+	tx.Query("insert into versions (version) values (2.0.0)")
+	tx.Query("insert into versions (version) values (3.0.0)")
+
+	tx.Query("insert into players (id, name) values ('1', 'marcus')")
+
+	tx.Query(`
+        insert into templates (id playerId, data, name, createdAt, updatedAt) values
+        ("1", "1", "", "A", '20120618 10:34:09 AM', '20120618 10:34:09 AM')
+    `)
+
+	tx.Query(`
+        insert into test_events
+        (id, environment, difficulty, templateId, startedAt, version) values
+        ("1", "lab", "normal", " ",'20120618 10:34:09 AM', "1.0.0")
+    `)
+
+	tx.Commit()
+
+	t.Run("it should return empty array", func(t *testing.T) {
+		limit := int64(1)
+		data, err := q.GetMostRecentStats(mc, database.GetMostRecentStatsParams{
+			Limit:   limit,
+			Limit_2: limit,
+			Limit_3: limit,
+			Limit_4: limit,
+			Limit_5: limit,
+		})
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "failed to execute query %s", err)
+			os.Exit(1)
+		}
+
+		if len(data) != 0 {
+			t.Fail()
+		}
+	})
+}
 
 func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 	// tempDir := t.TempDir()
@@ -155,8 +155,6 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 	mc := MockCtx{}
 
 	db.Query("insert into versions (value) values ('1.0.0')")
-	db.Query("insert into versions (value) values ('2.0.0')")
-	db.Query("insert into versions (value) values ('3.0.0')")
 
 	db.Query("insert into players (id, name) values ('1', 'marcus')")
 
@@ -197,11 +195,12 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 		if len(data) != 1 {
 			t.Fail()
 		}
-		if !almostEqual(data[0].Avgwave.Float64, 10) || data[0].Maxwave != 10 || data[0].Numoftestevents != 1 {
+		if !almostEqual(data[0].Avgwave, 10) || data[0].Maxwave != 10 || data[0].Numoftestevents != 1 {
 			t.Fail()
 		}
 	})
 
+	db.Query("insert into versions (value) values ('2.0.0')")
 	db.Query(`
         insert into test_results
         (id, moneyEarned, endedAt) values
@@ -217,28 +216,7 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
         ('2', 'lab', 'normal', '1', '2', '2012-06-18 10:34:09', '2.0.0')
     `)
 
-	t.Run("it should return test evt with avg wave of 20, max wave of 20, count 1", func(t *testing.T) {
-		limit := int64(1)
-		data, err := q.GetMostRecentStats(mc, database.GetMostRecentStatsParams{
-			Limit:   limit,
-			Limit_2: limit,
-			Limit_3: limit,
-			Limit_4: limit,
-			Limit_5: limit,
-		})
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "failed to execute query %s", err)
-			os.Exit(1)
-		}
-
-		if len(data) != 1 {
-			t.Fail()
-		}
-		// if !almostEqual(data[0].Avgwave.Float64, 15) || data[0].Maxwave != 10 || data[0].Numoftestevents != 1 {
-		// 	t.Fail()
-		// }
-	})
-	t.Run("it should return test evt with avg wave of 15, max wave of 15, count 2", func(t *testing.T) {
+	t.Run("it should return 2 test evt with #1 with avg wave of 20 max wave 20 count 1 #2 with avg wave of 20 max wave of 20 count 1", func(t *testing.T) {
 		limit := int64(2)
 		data, err := q.GetMostRecentStats(mc, database.GetMostRecentStatsParams{
 			Limit:   limit,
@@ -255,19 +233,19 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 		if len(data) != 2 {
 			t.Fail()
 		}
-		// if !almostEqual(data[0].Avgwave.Float64, 15) || data[0].Maxwave != 10 || data[0].Numoftestevents != 1 {
-		// 	t.Fail()
-		// }
+		if !almostEqual(data[0].Avgwave, 20) || data[0].Maxwave != 20 || data[0].Numoftestevents != 1 {
+			t.Fail()
+		}
+		if !almostEqual(data[1].Avgwave, 10) || data[1].Maxwave != 10 || data[1].Numoftestevents != 1 {
+			t.Fail()
+		}
 	})
 
-	_, err = db.Query(`
+	db.Query(`
         insert into test_results
         (id, moneyEarned, endedAt) values
         ('3', 10, '2012-06-18 10:34:09')
     `)
-	if err != nil {
-		fmt.Printf("err: %v", err)
-	}
 	db.Query(`
         insert into player_test_results (playerId, testResultId, waveDied, diedTo) values
         ('1', '3', 10, 'Bombs From Above')
@@ -278,7 +256,18 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
         ('3', 'lab', 'normal', '1', '3', '2012-06-18 10:34:09', '2.0.0')
     `)
 
-	t.Run("it should return test evt with avg wave of 15, max wave of 15, count 2", func(t *testing.T) {
+	// No test result
+	db.Query(`
+        insert into player_test_results (playerId, testResultId, waveDied, diedTo) values
+        ('1', '4', 10, 'Bombs From Above')
+    `)
+	db.Query(`
+        insert into test_events
+        (id, environment, difficulty, templateId, startedAt, version) values
+        ('4', 'lab', 'normal', '1', '2012-06-18 10:34:09', '2.0.0')
+    `)
+
+	t.Run("it should return 2 evt: #1 avg wave 15 max wave 20 count 2 #2 avg wave 10 max wave 10 num of events 1", func(t *testing.T) {
 		limit := int64(2)
 		data, err := q.GetMostRecentStats(mc, database.GetMostRecentStatsParams{
 			Limit:   limit,
@@ -292,13 +281,15 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 			os.Exit(1)
 		}
 
-		fmt.Printf("3: %v", data)
 		if len(data) != 2 {
 			t.Fail()
 		}
-		// if !almostEqual(data[0].Avgwave.Float64, 15) || data[0].Maxwave != 10 || data[0].Numoftestevents != 1 {
-		// 	t.Fail()
-		// }
+		if !almostEqual(data[0].Avgwave, 15) || data[0].Maxwave != 20 || data[0].Numoftestevents != 2 {
+			t.Fail()
+		}
+		if !almostEqual(data[1].Avgwave, 10) || data[1].Maxwave != 10 || data[1].Numoftestevents != 1 {
+			t.Fail()
+		}
 	})
 }
 
