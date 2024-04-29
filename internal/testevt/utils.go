@@ -28,10 +28,10 @@ func TransformToEvtResProps(evtData database.GetTestEvtResultsRow, playerData []
 	playerInfo := make([]testevt.TestEvtPlayerRes, len(playerData))
 	for i, p := range playerData {
 		playerInfo[i] = testevt.TestEvtPlayerRes{
-			ID:       p.Player.ID,
-			Name:     p.Player.Name,
-			DiedTo:   p.PlayerTestResult.Diedto,
-			WaveDied: strconv.Itoa(int(p.PlayerTestResult.Wavedied)),
+			ID:            p.Player.ID,
+			Name:          p.Player.Name,
+			DiedTo:        p.PlayerTestResult.Diedto,
+			WavesSurvived: strconv.Itoa(int(p.PlayerTestResult.Wavessurvived)),
 		}
 	}
 	duration := evtData.TestResult.Endedat.Sub(evtData.TestEvent.Startedat)

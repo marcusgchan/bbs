@@ -3,10 +3,10 @@ package testevt;
 import "github.com/marcusgchan/bbs/internal/sview"
 
 type TestEvtPlayerRes struct {
-	ID       string
-	Name     string
-	DiedTo   string
-	WaveDied string
+	ID            string
+	Name          string
+	DiedTo        string
+	WavesSurvived string
 }
 
 type TestEvtResProps struct {
@@ -56,7 +56,7 @@ templ TestEvtResContent(evtRes TestEvtResProps, template TestEvtTemplateRes, pla
 					<h2>Player ID: { player.ID }</h2>
 					<h2>Name: { player.Name }</h2>
 					<h2>Died To: { player.DiedTo }</h2>
-					<h2>Wave Died: { player.WaveDied }</h2>
+					<h2>Wave Died: { player.WavesSurvived }</h2>
 				</li>
 			}
 		</ul>

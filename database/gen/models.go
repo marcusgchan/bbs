@@ -28,10 +28,10 @@ type PlayerComponent struct {
 }
 
 type PlayerTestResult struct {
-	Playerid     string
-	Testresultid int64
-	Wavedied     int64
-	Diedto       string
+	Playerid      string
+	Testresultid  int64
+	Wavessurvived int64
+	Diedto        string
 }
 
 type Template struct {

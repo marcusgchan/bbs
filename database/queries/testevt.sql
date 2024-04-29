@@ -11,7 +11,7 @@ INSERT INTO test_results (moneyEarned, endedAt) VALUES (?, ?) RETURNING id;
 UPDATE test_events SET testResultId = ? WHERE id = ?;
 
 -- name: CreatePlayerTestResult :exec
-INSERT INTO player_test_results (playerId, testResultId, waveDied, diedTo) VALUES (?, ?, ?, ?);
+INSERT INTO player_test_results (playerId, testResultId, wavesSurvived, diedTo) VALUES (?, ?, ?, ?);
 
 -- name: GetTestEvts :many
 SELECT test_events.*, players.name as mainPlayer 

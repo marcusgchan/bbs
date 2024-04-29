@@ -40,7 +40,7 @@ CREATE TABLE users(
 CREATE TABLE player_test_results (
     playerId varchar(255) NOT NULL,
     testResultId INTEGER NOT NULL,
-    waveDied INTEGER NOT NULL check(waveDied > 0),
+    wavesSurvived INTEGER NOT NULL check(wavesSurvived > 0),
     diedTo varchar(255) NOT NULL,
     PRIMARY KEY (playerId, testResultId),
     FOREIGN KEY (playerId) REFERENCES players (id),

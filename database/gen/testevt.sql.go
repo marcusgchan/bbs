@@ -12,21 +12,21 @@ import (
 )
 
 const createPlayerTestResult = `-- name: CreatePlayerTestResult :exec
-INSERT INTO player_test_results (playerId, testResultId, waveDied, diedTo) VALUES (?, ?, ?, ?)
+INSERT INTO player_test_results (playerId, testResultId, wavesSurvived, diedTo) VALUES (?, ?, ?, ?)
 `
 
 type CreatePlayerTestResultParams struct {
-	Playerid     string
-	Testresultid int64
-	Wavedied     int64
-	Diedto       string
+	Playerid      string
+	Testresultid  int64
+	Wavessurvived int64
+	Diedto        string
 }
 
 func (q *Queries) CreatePlayerTestResult(ctx context.Context, arg CreatePlayerTestResultParams) error {
 	_, err := q.db.ExecContext(ctx, createPlayerTestResult,
 		arg.Playerid,
 		arg.Testresultid,
-		arg.Wavedied,
+		arg.Wavessurvived,
 		arg.Diedto,
 	)
 	return err
@@ -72,7 +72,7 @@ func (q *Queries) CreateTestResult(ctx context.Context, arg CreateTestResultPara
 }
 
 const getTestEvtPlayerResults = `-- name: GetTestEvtPlayerResults :many
-SELECT player_test_results.playerid, player_test_results.testresultid, player_test_results.wavedied, player_test_results.diedto, players.id, players.name, players.createdat, players.updatedat
+SELECT player_test_results.playerid, player_test_results.testresultid, player_test_results.wavessurvived, player_test_results.diedto, players.id, players.name, players.createdat, players.updatedat
 FROM player_test_results
 JOIN players ON player_test_results.playerId = players.id
 WHERE player_test_results.testResultId = ?
@@ -95,7 +95,7 @@ func (q *Queries) GetTestEvtPlayerResults(ctx context.Context, testresultid int6
 		if err := rows.Scan(
 			&i.PlayerTestResult.Playerid,
 			&i.PlayerTestResult.Testresultid,
-			&i.PlayerTestResult.Wavedied,
+			&i.PlayerTestResult.Wavessurvived,
 			&i.PlayerTestResult.Diedto,
 			&i.Player.ID,
 			&i.Player.Name,

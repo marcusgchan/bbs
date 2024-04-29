@@ -129,9 +129,9 @@ func (h TestEventHandler) CreateTestEvent(c echo.Context) error {
 }
 
 type player struct {
-	ID       string `json:"id"`
-	WaveDied int64  `json:"waveDied"`
-	DiedTo   string `json:"diedTo"`
+	ID            string `json:"id"`
+	WavesSurvived int64  `json:"wavesSurvived"`
+	DiedTo        string `json:"diedTo"`
 }
 
 type CreateTestResultReq struct {
@@ -167,10 +167,10 @@ func (h TestEventHandler) CreatePlayerTestResult(c echo.Context) error {
 	for _, p := range data.Players {
 		// Create player test result
 		h.Q.CreatePlayerTestResult(c.Request().Context(), database.CreatePlayerTestResultParams{
-			Playerid:     p.ID,
-			Testresultid: createdTestResId,
-			Wavedied:     p.WaveDied,
-			Diedto:       p.DiedTo,
+			Playerid:      p.ID,
+			Testresultid:  createdTestResId,
+			Wavessurvived: p.WavesSurvived,
+			Diedto:        p.DiedTo,
 		})
 		if err != nil {
 			return err
