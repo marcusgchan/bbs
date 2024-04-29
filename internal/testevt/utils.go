@@ -41,6 +41,7 @@ func TransformToEvtResProps(evtData database.GetTestEvtResultsRow, playerData []
 		Environment: evtData.TestEvent.Environment,
 		StartedAt:   evtData.TestEvent.Startedat.String(),
 		EndedAt:     evtData.TestResult.Endedat.String(),
+		MoneyEarned: strconv.Itoa(int(evtData.TestResult.Moneyearned)),
 		Duration:    fmt.Sprintf("%.2f", duration.Minutes()),
 	}
 	template := testevt.TestEvtTemplateRes{

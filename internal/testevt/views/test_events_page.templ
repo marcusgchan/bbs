@@ -44,6 +44,7 @@ templ TestEvtRows(props []TestEvtProps, nextPage int) {
 				hx-get={ string(templ.URL(fmt.Sprintf("/test-events/%s", prop.ID))) }
 				hx-swap="innerHTML"
 				hx-target="main"
+				hx-push-url="true"
 			}
 		>
 			<td
