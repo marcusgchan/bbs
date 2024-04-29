@@ -15,6 +15,7 @@ import (
 
 	database "github.com/marcusgchan/bbs/database/gen"
 	sqlc "github.com/marcusgchan/bbs/database/gen"
+	"github.com/stretchr/testify/assert"
 	_ "github.com/tursodatabase/go-libsql"
 )
 
@@ -130,10 +131,7 @@ func TestMostRecentStatsWithTestEventButNoTestResult(t *testing.T) {
 			fmt.Fprintf(os.Stderr, "failed to execute query %s", err)
 			os.Exit(1)
 		}
-
-		if len(data) != 0 {
-			t.Fail()
-		}
+		assert.Equal(t, 0, len(data))
 	})
 }
 
@@ -191,12 +189,10 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 			fmt.Fprintf(os.Stderr, "failed to execute query %s", err)
 			os.Exit(1)
 		}
-		if len(data) != 1 {
-			t.Fail()
-		}
-		if !almostEqual(data[0].Avgwave, 10) || data[0].Maxwave != 10 || data[0].Numoftestevents != 1 {
-			t.Fail()
-		}
+		assert.Equal(t, 1, len(data))
+		assert.InDelta(t, float64(10), data[0].Avgwave, float64EqualityThreshold)
+		assert.Equal(t, int64(10), data[0].Maxwave)
+		assert.Equal(t, int64(1), data[0].Numoftestevents)
 	})
 
 	db.Query("insert into versions (value) values ('2.0.0')")
@@ -229,15 +225,13 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 			os.Exit(1)
 		}
 
-		if len(data) != 2 {
-			t.Fail()
-		}
-		if !almostEqual(data[0].Avgwave, 20) || data[0].Maxwave != 20 || data[0].Numoftestevents != 1 {
-			t.Fail()
-		}
-		if !almostEqual(data[1].Avgwave, 10) || data[1].Maxwave != 10 || data[1].Numoftestevents != 1 {
-			t.Fail()
-		}
+		assert.Equal(t, 2, len(data))
+		assert.InDelta(t, float64(20), data[0].Avgwave, float64EqualityThreshold)
+		assert.Equal(t, int64(20), data[0].Maxwave)
+		assert.Equal(t, int64(1), data[0].Numoftestevents)
+		assert.InDelta(t, float64(10), data[1].Avgwave, float64EqualityThreshold)
+		assert.Equal(t, int64(10), data[1].Maxwave)
+		assert.Equal(t, int64(1), data[1].Numoftestevents)
 	})
 
 	db.Query(`
@@ -280,16 +274,19 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 			os.Exit(1)
 		}
 
-		if len(data) != 2 {
-			t.Fail()
-		}
-		fmt.Printf("data: %v", data)
-		if !almostEqual(data[0].Avgwave, 15) || data[0].Maxwave != 20 || data[0].Numoftestevents != 2 || data[0].Startdate != "2024-02-01T00:00:00Z" || data[0].Enddate != "2024-02-05T00:00:00Z" {
-			t.Fail()
-		}
-		if !almostEqual(data[1].Avgwave, 10) || data[1].Maxwave != 10 || data[1].Numoftestevents != 1 || data[1].Startdate != "2024-01-01T00:00:00Z" || data[1].Enddate != "2024-01-05T00:00:00Z" {
-			t.Fail()
-		}
+		assert.Equal(t, 2, len(data))
+
+		assert.InDelta(t, float64(15), data[0].Avgwave, float64EqualityThreshold)
+		assert.Equal(t, int64(20), data[0].Maxwave)
+		assert.Equal(t, int64(2), data[0].Numoftestevents)
+		assert.Equal(t, "2024-02-01T00:00:00Z", data[0].Startdate)
+		assert.Equal(t, "2024-02-05T00:00:00Z", data[0].Enddate)
+
+		assert.InDelta(t, float64(10), data[1].Avgwave, float64EqualityThreshold)
+		assert.Equal(t, int64(10), data[1].Maxwave)
+		assert.Equal(t, int64(1), data[1].Numoftestevents)
+		assert.Equal(t, "2024-01-01T00:00:00Z", data[1].Startdate)
+		assert.Equal(t, "2024-01-05T00:00:00Z", data[1].Enddate)
 	})
 }
 
@@ -310,7 +307,3 @@ func createTables(tempDir string, relPathToDb string) {
 }
 
 const float64EqualityThreshold = 1e-9
-
-func almostEqual(a, b float64) bool {
-	return math.Abs(a-b) <= float64EqualityThreshold
-}
