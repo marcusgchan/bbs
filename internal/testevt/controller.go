@@ -95,7 +95,7 @@ func (h TestEventHandler) TestEvtResPage(c echo.Context) error {
 type CreateTestEvtReq struct {
 	ID              string   `json:"id"`
 	MainPlayerID    string   `json:"mainPlayerId"`
-	Players         []string `json:"players"`
+	PlayerIds       []string `json:"playerIds"`
 	EnvironmentName string   `json:"environmentName"`
 	TemplateID      string   `json:"templateId"`
 	Difficulty      string   `json:"difficulty"`
@@ -123,6 +123,15 @@ func (h TestEventHandler) CreateTestEvent(c echo.Context) error {
 	})
 	if err != nil {
 		return err
+	}
+	for _, playerId := range data.PlayerIds {
+		err = qtx.CreatePlayerTestEvt(c.Request().Context(), database.CreatePlayerTestEvtParams{
+			Playerid:    playerId,
+			Testeventid: data.ID,
+		})
+		if err != nil {
+			return err
+		}
 	}
 	tx.Commit()
 	return c.NoContent(204)

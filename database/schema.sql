@@ -32,6 +32,14 @@ CREATE TABLE test_events (
     FOREIGN KEY (testResultId) REFERENCES test_results (id)
 );
 
+CREATE TABLE player_test_events (
+    playerId varchar(255) NOT NULL,
+    testEventId varchar(255) NOT NULL,
+    FOREIGN KEY (playerId) REFERENCES players (id),
+    FOREIGN KEY (testEventId) REFERENCES test_events (id),
+    PRIMARY KEY (playerId, testEventId)
+);
+
 CREATE TABLE users(
     username varchar(255) NOT NULL,
     password varchar(255) NOT NULL

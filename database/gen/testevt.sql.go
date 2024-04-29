@@ -11,6 +11,20 @@ import (
 	"time"
 )
 
+const createPlayerTestEvt = `-- name: CreatePlayerTestEvt :exec
+INSERT INTO player_test_events (playerId, testEventId) values (?, ?)
+`
+
+type CreatePlayerTestEvtParams struct {
+	Playerid    string
+	Testeventid string
+}
+
+func (q *Queries) CreatePlayerTestEvt(ctx context.Context, arg CreatePlayerTestEvtParams) error {
+	_, err := q.db.ExecContext(ctx, createPlayerTestEvt, arg.Playerid, arg.Testeventid)
+	return err
+}
+
 const createPlayerTestResult = `-- name: CreatePlayerTestResult :exec
 INSERT INTO player_test_results (playerId, testResultId, wavesSurvived, diedTo) VALUES (?, ?, ?, ?)
 `

@@ -27,6 +27,11 @@ type PlayerComponent struct {
 	Count     int64
 }
 
+type PlayerTestEvent struct {
+	Playerid    string
+	Testeventid string
+}
+
 type PlayerTestResult struct {
 	Playerid      string
 	Testresultid  int64
