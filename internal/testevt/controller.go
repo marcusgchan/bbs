@@ -148,19 +148,20 @@ func (h TestEventHandler) CreatePlayerTestResult(c echo.Context) error {
 		return err
 	}
 	tx, err := h.DB.Begin()
+	qtx := h.Q.WithTx(tx)
 	if err != nil {
 		return err
 	}
 	defer tx.Rollback()
 	// Create general test result
-	createdTestResId, err := h.Q.CreateTestResult(c.Request().Context(), database.CreateTestResultParams{
+	createdTestResId, err := qtx.CreateTestResult(c.Request().Context(), database.CreateTestResultParams{
 		Moneyearned: data.MoneyEarned,
 		Endedat:     time.Unix(data.Date, 0),
 	})
 	if err != nil {
 		return err
 	}
-	err = h.Q.UpdateTestEvtWithTestRes(c.Request().Context(), database.UpdateTestEvtWithTestResParams{
+	err = qtx.UpdateTestEvtWithTestRes(c.Request().Context(), database.UpdateTestEvtWithTestResParams{
 		Testresultid: sql.NullInt64{Int64: createdTestResId, Valid: true},
 		ID:           data.TestEvtID,
 	})
@@ -169,7 +170,7 @@ func (h TestEventHandler) CreatePlayerTestResult(c echo.Context) error {
 	}
 	for _, p := range data.Players {
 		// Create player test result
-		err = h.Q.CreatePlayerTestResult(c.Request().Context(), database.CreatePlayerTestResultParams{
+		err = qtx.CreatePlayerTestResult(c.Request().Context(), database.CreatePlayerTestResultParams{
 			Playerid:      p.ID,
 			Testresultid:  createdTestResId,
 			Wavessurvived: p.WavesSurvived,
