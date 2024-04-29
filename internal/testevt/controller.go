@@ -179,5 +179,6 @@ func (h TestEventHandler) CreatePlayerTestResult(c echo.Context) error {
 			return err
 		}
 	}
+	tx.Commit()
 	return c.NoContent(204)
 }
