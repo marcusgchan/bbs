@@ -135,7 +135,7 @@ type player struct {
 }
 
 type CreateTestResultReq struct {
-	TestEvtID   string   `json:"testEvtId"`
+	TestEvtID   string   `json:"testEventId"`
 	MoneyEarned int64    `json:"moneyEarned"`
 	Players     []player `json:"players"`
 	Date        int64    `json:"date"`
