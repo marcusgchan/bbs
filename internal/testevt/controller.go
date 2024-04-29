@@ -152,7 +152,6 @@ func (h TestEventHandler) CreatePlayerTestResult(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
 	// Create general test result
 	createdTestResId, err := qtx.CreateTestResult(c.Request().Context(), database.CreateTestResultParams{
 		Moneyearned: data.MoneyEarned,
