@@ -13,9 +13,9 @@ func TransformToStatsProps(singleStats *database.GetStatsByVersionRow, multiStat
 	for i, s := range *multiStats {
 		multiStatsProps[i] = stats.Stats{
 			Version:         s.Version,
-			StartDate:       s.Startdate.String(),
-			EndDate:         s.Enddate.String(),
-			AvgWaveSurvived: fmt.Sprintf("%f.2", s.Avgwave.Float64),
+			StartDate:       s.Startdate,
+			EndDate:         s.Enddate,
+			AvgWaveSurvived: fmt.Sprintf("%f.2", s.Avgwave),
 			HighestWave:     strconv.Itoa(int(s.Maxwave)),
 			Count:           strconv.Itoa(int(s.Numoftestevents)),
 		}

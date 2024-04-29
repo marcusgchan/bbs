@@ -1,7 +1,7 @@
 -- name: GetMostRecentStats :many
 SELECT Avg.version, Avg.avgWave, Max.maxWave, Count.numOfTestEvents, StartDate.startDate, EndDate.endDate
     FROM (
-    SELECT test_events.version, CAST(AVG(player_test_results.waveDied) AS REAL) as avgWave
+    SELECT test_events.version, CAST(AVG(player_test_results.wavesSurvived) AS REAL) as avgWave
     FROM (
         SELECT DISTINCT value as version FROM versions
         ORDER BY value DESC
@@ -12,7 +12,7 @@ SELECT Avg.version, Avg.avgWave, Max.maxWave, Count.numOfTestEvents, StartDate.s
     JOIN player_test_results ON test_events.testResultId = player_test_results.testresultId
     GROUP BY test_events.version
 ) as Avg, (
-    SELECT test_events.version, CAST(MAX(player_test_results.waveDied) AS INTEGER) as maxWave
+    SELECT test_events.version, CAST(MAX(player_test_results.wavesSurvived) AS INTEGER) as maxWave
     FROM (
         SELECT DISTINCT value as version FROM versions
         ORDER BY value DESC
@@ -63,12 +63,12 @@ ORDER BY Avg.version DESC;
 -- name: GetStatsByVersion :one
 SELECT Avg.version, Avg.avgWave, Max.maxWave, Count.numOfTestEvents, StartDate.startDate, EndDate.endDate
 FROM (
-    SELECT test_events.version, AVG(player_test_results.waveDied) as avgWave
+    SELECT test_events.version, AVG(player_test_results.wavesSurvived) as avgWave
     FROM test_events
     JOIN player_test_results ON player_test_results.testResultId = test_events.testResultId
     WHERE test_events.testResultId IS NOT NULL AND test_events.version = ?
 ) as Avg, (
-    SELECT test_events.version, CAST(MAX(player_test_results.waveDied) AS INTEGER) as maxWave
+    SELECT test_events.version, CAST(MAX(player_test_results.wavesSurvived) AS INTEGER) as maxWave
     FROM test_events
     JOIN player_test_results ON player_test_results.testResultId = test_events.testResultId
     WHERE test_events.testResultId IS NOT NULL AND test_events.version = ?

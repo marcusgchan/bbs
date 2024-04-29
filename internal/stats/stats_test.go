@@ -166,16 +166,16 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 	db.Query(`
         insert into test_results
         (id, moneyEarned, endedAt) values
-        ('1', 10, '2012-06-18 10:34:09')
+        ('1', 10, '2024-01-05 00:00:00')
     `)
 	db.Query(`
-        insert into player_test_results (playerId, testResultId, waveDied, diedTo) values
+        insert into player_test_results (playerId, testResultId, wavesSurvived, diedTo) values
         ('1', '1', 10, 'Bombs From Above')
     `)
 	db.Query(`
         insert into test_events
         (id, environment, difficulty, templateId, testResultId, startedAt, version) values
-        ('1', 'lab', 'normal', '1', '1', '2012-06-18 10:34:09', '1.0.0')
+        ('1', 'lab', 'normal', '1', '1', '2024-01-01 00:00:00', '1.0.0')
     `)
 
 	t.Run("it should return test evt with avg wave of 10, max wave of 10, count 1", func(t *testing.T) {
@@ -191,7 +191,6 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 			fmt.Fprintf(os.Stderr, "failed to execute query %s", err)
 			os.Exit(1)
 		}
-
 		if len(data) != 1 {
 			t.Fail()
 		}
@@ -207,13 +206,13 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
         ('2', 10, '2012-06-18 10:34:09')
     `)
 	db.Query(`
-        insert into player_test_results (playerId, testResultId, waveDied, diedTo) values
+        insert into player_test_results (playerId, testResultId, wavesSurvived, diedTo) values
         ('1', '2', 20, 'Bombs From Above')
     `)
 	db.Query(`
         insert into test_events
         (id, environment, difficulty, templateId, testResultId, startedAt, version) values
-        ('2', 'lab', 'normal', '1', '2', '2012-06-18 10:34:09', '2.0.0')
+        ('2', 'lab', 'normal', '1', '2', '2024-02-01 00:00:00', '2.0.0')
     `)
 
 	t.Run("it should return 2 test evt with #1 with avg wave of 20 max wave 20 count 1 #2 with avg wave of 20 max wave of 20 count 1", func(t *testing.T) {
@@ -244,27 +243,27 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 	db.Query(`
         insert into test_results
         (id, moneyEarned, endedAt) values
-        ('3', 10, '2012-06-18 10:34:09')
+        ('3', 10, '2024-02-05 00:00:00')
     `)
 	db.Query(`
-        insert into player_test_results (playerId, testResultId, waveDied, diedTo) values
+        insert into player_test_results (playerId, testResultId, wavesSurvived, diedTo) values
         ('1', '3', 10, 'Bombs From Above')
     `)
 	db.Query(`
         insert into test_events
         (id, environment, difficulty, templateId, testResultId, startedAt, version) values
-        ('3', 'lab', 'normal', '1', '3', '2012-06-18 10:34:09', '2.0.0')
+        ('3', 'lab', 'normal', '1', '3', '2024-02-01 00:00:01', '2.0.0')
     `)
 
 	// No test result
 	db.Query(`
-        insert into player_test_results (playerId, testResultId, waveDied, diedTo) values
+        insert into player_test_results (playerId, testResultId, wavesSurvived, diedTo) values
         ('1', '4', 10, 'Bombs From Above')
     `)
 	db.Query(`
         insert into test_events
         (id, environment, difficulty, templateId, startedAt, version) values
-        ('4', 'lab', 'normal', '1', '2012-06-18 10:34:09', '2.0.0')
+        ('4', 'lab', 'normal', '1', '2024-02-20 00:00:00', '2.0.0')
     `)
 
 	t.Run("it should return 2 evt: #1 avg wave 15 max wave 20 count 2 #2 avg wave 10 max wave 10 num of events 1", func(t *testing.T) {
@@ -284,10 +283,11 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 		if len(data) != 2 {
 			t.Fail()
 		}
-		if !almostEqual(data[0].Avgwave, 15) || data[0].Maxwave != 20 || data[0].Numoftestevents != 2 {
+		fmt.Printf("data: %v", data)
+		if !almostEqual(data[0].Avgwave, 15) || data[0].Maxwave != 20 || data[0].Numoftestevents != 2 || data[0].Startdate != "2024-02-01T00:00:00Z" || data[0].Enddate != "2024-02-05T00:00:00Z" {
 			t.Fail()
 		}
-		if !almostEqual(data[1].Avgwave, 10) || data[1].Maxwave != 10 || data[1].Numoftestevents != 1 {
+		if !almostEqual(data[1].Avgwave, 10) || data[1].Maxwave != 10 || data[1].Numoftestevents != 1 || data[1].Startdate != "2024-01-01T00:00:00Z" || data[1].Enddate != "2024-01-05T00:00:00Z" {
 			t.Fail()
 		}
 	})
