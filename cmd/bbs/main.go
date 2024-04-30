@@ -53,6 +53,7 @@ func main() {
 	statsGroup.Use(auth.Authenticated)
 	statsHandler := stats.StatsHandler{Q: q, DB: db}
 	statsGroup.GET("", statsHandler.StatsPage)
+	statsGroup.GET("/latest-versions", statsHandler.LatestVersions)
 
 	app.GET("/*", func(c echo.Context) error {
 		return internal.Render(sview.NotFoundPage(), c)

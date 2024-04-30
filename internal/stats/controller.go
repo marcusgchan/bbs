@@ -8,6 +8,7 @@ import (
 	database "github.com/marcusgchan/bbs/database/gen"
 	"github.com/marcusgchan/bbs/internal"
 	"github.com/marcusgchan/bbs/internal/stats/views"
+	"github.com/marcusgchan/bbs/internal/sview"
 )
 
 type StatsHandler struct {
@@ -49,7 +50,29 @@ func (h StatsHandler) StatsPage(c echo.Context) error {
 	}
 
 	if internal.FromHTMX(c) {
-		return internal.Render(stats.StatsContent(TransformToStatsProps(singleStatsResP, &muliStatsRes)), c)
+		return internal.Render(stats.StatsContent(TransformSingleAndMultiToStatsProps(singleStatsResP, &muliStatsRes)), c)
 	}
-	return internal.Render(stats.StatsPage(TransformToStatsProps(singleStatsResP, &muliStatsRes)), c)
+	return internal.Render(stats.StatsPage(TransformSingleAndMultiToStatsProps(singleStatsResP, &muliStatsRes)), c)
+}
+
+func (h StatsHandler) LatestVersions(c echo.Context) error {
+	if !internal.FromHTMX(c) {
+		return internal.Render(sview.NotFoundPage(), c)
+	}
+	numOfVersions, err := strconv.Atoi(c.QueryParam("numverOfVersions"))
+	if err != nil || numOfVersions < 3 || numOfVersions > 10 {
+		numOfVersions = 3
+	}
+	data, err := h.Q.GetMostRecentStats(c.Request().Context(), database.GetMostRecentStatsParams{
+		Limit:   int64(numOfVersions),
+		Limit_2: int64(numOfVersions),
+		Limit_3: int64(numOfVersions),
+		Limit_4: int64(numOfVersions),
+		Limit_5: int64(numOfVersions),
+		Limit_6: int64(numOfVersions),
+	})
+	if err != nil {
+		return err
+	}
+	return internal.Render(stats.LatestVersionsList(TransformMultiToStats(&data)), c)
 }

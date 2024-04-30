@@ -8,7 +8,7 @@ import (
 	stats "github.com/marcusgchan/bbs/internal/stats/views"
 )
 
-func TransformToStatsProps(singleStats *database.GetStatsByVersionRow, multiStats *[]database.GetMostRecentStatsRow) *stats.StatsPageProps {
+func TransformSingleAndMultiToStatsProps(singleStats *database.GetStatsByVersionRow, multiStats *[]database.GetMostRecentStatsRow) *stats.StatsPageProps {
 	multiStatsProps := make([]stats.Stats, len(*multiStats))
 	for i, s := range *multiStats {
 		multiStatsProps[i] = stats.Stats{
@@ -36,4 +36,19 @@ func TransformToStatsProps(singleStats *database.GetStatsByVersionRow, multiStat
 			Count:           strconv.Itoa(int(singleStats.Numoftestevents)),
 		},
 	}
+}
+
+func TransformMultiToStats(data *[]database.GetMostRecentStatsRow) *[]stats.Stats {
+	s := make([]stats.Stats, len(*data))
+	for i, v := range *data {
+		s[i] = stats.Stats{
+			Version:         v.Version,
+			StartDate:       v.Startdate,
+			EndDate:         v.Enddate,
+			AvgWaveSurvived: fmt.Sprintf("%.2f", v.Avgwave),
+			HighestWave:     strconv.Itoa(int(v.Maxwave)),
+			Count:           strconv.Itoa(int(v.Numoftestevents)),
+		}
+	}
+	return &s
 }

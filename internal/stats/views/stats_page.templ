@@ -51,25 +51,36 @@ templ StatsContent(props *StatsPageProps) {
 		</section>
 		<section class="space-y-2">
 			<div class="flex gap-2 justify-between">
-				<h2 class="text-lg">Versions</h2>
-				<input class="w-12" min="3" max="10" required value="3" type="number"/>
+				<h2 class="text-lg">Latest Versions</h2>
+				<select class="p-2" hx-get="/stats/latest-versions" hx-trigger="change" hx-target="[data-latest-versions]" hx-swap="outerHTML" name="numberOfVersions" value="3">
+					<option>3</option>
+					<option>4</option>
+					<option>5</option>
+					<option>6</option>
+					<option>7</option>
+					<option>8</option>
+				</select>
 			</div>
-			<ul class="space-y-2">
-				if len(*props.Multi) == 0 {
-					<p>No Versions</p>
-				} else {
-					for _, s := range *props.Multi {
-						<li>
-							<p>Version: { s.Version }</p>
-							<p>Start date: { s.StartDate }</p>
-							<p>End date: { s.EndDate }</p>
-							<p>Avg wave survived: { s.AvgWaveSurvived }</p>
-							<p>Highest wave survived: { s.HighestWave }</p>
-							<p>Total number of test events: { s.Count }</p>
-						</li>
-					}
-				}
-			</ul>
+			@LatestVersionsList(props.Multi)
 		</section>
 	</div>
+}
+
+templ LatestVersionsList(versions *[]Stats) {
+	<ul data-latest-versions class="space-y-2">
+		if len(*versions) == 0 {
+			<p>No Versions</p>
+		} else {
+			for _, s := range *versions {
+				<li>
+					<p>Version: { s.Version }</p>
+					<p>Start date: { s.StartDate }</p>
+					<p>End date: { s.EndDate }</p>
+					<p>Avg wave survived: { s.AvgWaveSurvived }</p>
+					<p>Highest wave survived: { s.HighestWave }</p>
+					<p>Total number of test events: { s.Count }</p>
+				</li>
+			}
+		}
+	</ul>
 }
