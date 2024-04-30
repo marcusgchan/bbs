@@ -1,5 +1,5 @@
 -- name: GetMostRecentStats :many
-SELECT Avg.version, Avg.avgWave, AvgMoney.avgMoneyEarned, Max.maxWave, Count.numOfTestEvents, StartDate.startDate, EndDate.endDate
+SELECT AvgWave.version, AvgWave.avgWave, AvgMoney.avgMoneyEarned, MaxWave.maxWave, Count.numOfTestEvents, StartDate.startDate, EndDate.endDate
     FROM (
     SELECT test_events.version, CAST(AVG(player_test_results.wavesSurvived) AS REAL) as avgWave
     FROM (
@@ -11,7 +11,7 @@ SELECT Avg.version, Avg.avgWave, AvgMoney.avgMoneyEarned, Max.maxWave, Count.num
     INNER JOIN test_results ON test_events.testResultId = test_results.id
     JOIN player_test_results ON test_events.testResultId = player_test_results.testresultId
     GROUP BY test_events.version
-) as Avg, (
+) as AvgWave, (
     SELECT test_events.version, CAST(MAX(player_test_results.wavesSurvived) AS INTEGER) as maxWave
     FROM (
         SELECT DISTINCT value as version FROM versions
@@ -22,7 +22,7 @@ SELECT Avg.version, Avg.avgWave, AvgMoney.avgMoneyEarned, Max.maxWave, Count.num
     INNER JOIN test_results ON test_events.testResultId = test_results.id
     JOIN player_test_results ON test_events.testResultId = player_test_results.testresultId
     GROUP BY test_events.version
-) as Max, (
+) as MaxWave, (
     SELECT test_events.version, CAST(AVG(test_results.moneyEarned) as REAL) as avgMoneyEarned
     FROM (
         SELECT DISTINCT value as version 
@@ -65,12 +65,12 @@ SELECT Avg.version, Avg.avgWave, AvgMoney.avgMoneyEarned, Max.maxWave, Count.num
     INNER JOIN test_results ON test_events.testResultId = test_results.id
     GROUP BY test_events.version
 ) as EndDate
-WHERE Avg.version = Max.version
-AND Max.version = Count.version 
+WHERE AvgWave.version = MaxWave.version
+AND MaxWave.version = Count.version 
 AND AvgMoney.version = Count.version
 AND Count.version = StartDate.version 
 AND StartDate.version = EndDate.version
-ORDER BY Avg.version DESC;
+ORDER BY AvgWave.version DESC;
 
 -- name: GetStatsByVersion :one
 SELECT Avg.version, Avg.avgWave, Max.maxWave, Count.numOfTestEvents, StartDate.startDate, EndDate.endDate
