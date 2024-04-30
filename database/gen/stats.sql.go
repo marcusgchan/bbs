@@ -7,14 +7,12 @@ package database
 
 import (
 	"context"
-	"database/sql"
-	"time"
 )
 
 const getMostRecentStats = `-- name: GetMostRecentStats :many
 SELECT AvgWave.version, AvgWave.avgWave, AvgMoney.avgMoneyEarned, MaxWave.maxWave, Count.numOfTestEvents, StartDate.startDate, EndDate.endDate
     FROM (
-    SELECT test_events.version, CAST(AVG(player_test_results.wavesSurvived) AS REAL) as avgWave
+    SELECT test_events.version, CAST(AVG(player_test_results.wavesSurvived) as REAL) as avgWave
     FROM (
         SELECT DISTINCT value as version FROM versions
         ORDER BY value DESC
@@ -144,33 +142,39 @@ func (q *Queries) GetMostRecentStats(ctx context.Context, arg GetMostRecentStats
 }
 
 const getStatsByVersion = `-- name: GetStatsByVersion :one
-SELECT Avg.version, Avg.avgWave, Max.maxWave, Count.numOfTestEvents, StartDate.startDate, EndDate.endDate
+SELECT AvgWave.version, AvgWave.avgWave, AvgMoney.avgMoneyEarned, MaxWave.maxWave, Count.numOfTestEvents, StartDate.startDate, EndDate.endDate
 FROM (
-    SELECT test_events.version, AVG(player_test_results.wavesSurvived) as avgWave
+    SELECT test_events.version, CAST(AVG(player_test_results.wavesSurvived) as REAL) as avgWave
     FROM test_events
-    JOIN player_test_results ON player_test_results.testResultId = test_events.testResultId
-    WHERE test_events.testResultId IS NOT NULL AND test_events.version = ?
-) as Avg, (
+    INNER JOIN player_test_results ON player_test_results.testResultId = test_events.testResultId
+    WHERE test_events.version = ?
+) as AvgWave, (
+    SELECT test_events.version, CAST(AVG(test_results.moneyEarned) as REAL) as avgMoneyEarned
+    FROM test_events
+    INNER JOIN test_results ON test_events.testResultId = test_results.id
+    WHERE test_events.version = ?
+) as AvgMoney, (
     SELECT test_events.version, CAST(MAX(player_test_results.wavesSurvived) AS INTEGER) as maxWave
     FROM test_events
-    JOIN player_test_results ON player_test_results.testResultId = test_events.testResultId
-    WHERE test_events.testResultId IS NOT NULL AND test_events.version = ?
-) as Max, (
+    INNER JOIN player_test_results ON player_test_results.testResultId = test_events.testResultId
+    WHERE test_events.version = ?
+) as MaxWave, (
     SELECT test_events.version, COUNT(test_events.id) as numOfTestEvents
     FROM test_events
     WHERE test_events.testResultId IS NOT NULL AND test_events.version = ?
 ) as Count, (
-    SELECT test_events.version, CAST(MIN(test_events.startedAt) AS DATETIME) as startDate
+    SELECT test_events.version, CAST(MIN(test_events.startedAt) AS TEXT) as startDate
     FROM test_events
     WHERE test_events.testResultId IS NOT NULL AND test_events.version = ?
 ) as StartDate, (
-    SELECT test_events.version, CAST(MAX(test_results.endedAt) AS DATETIME) as endDate
+    SELECT test_events.version, CAST(MAX(test_results.endedAt) AS TEXT) as endDate
     FROM test_events
-    JOIN test_results ON test_events.testResultId = test_results.id
-    WHERE test_events.testResultId IS NOT NULL AND test_events.version = ?
+    INNER JOIN test_results ON test_events.testResultId = test_results.id
+    WHERE test_events.version = ?
 ) as EndDate
-WHERE Avg.version = Max.version 
-AND Max.version = Count.version
+WHERE Avg.version = MaxWave.version 
+AND MaxWave.version = Count.version
+AND AvgMoney.version = Count.version
 AND Count.version = StartDate.version
 AND StartDate.version = EndDate.version
 `
@@ -181,15 +185,17 @@ type GetStatsByVersionParams struct {
 	Version_3 string
 	Version_4 string
 	Version_5 string
+	Version_6 string
 }
 
 type GetStatsByVersionRow struct {
 	Version         string
-	Avgwave         sql.NullFloat64
+	Avgwave         float64
+	Avgmoneyearned  float64
 	Maxwave         int64
 	Numoftestevents int64
-	Startdate       time.Time
-	Enddate         time.Time
+	Startdate       string
+	Enddate         string
 }
 
 func (q *Queries) GetStatsByVersion(ctx context.Context, arg GetStatsByVersionParams) (GetStatsByVersionRow, error) {
@@ -199,11 +205,13 @@ func (q *Queries) GetStatsByVersion(ctx context.Context, arg GetStatsByVersionPa
 		arg.Version_3,
 		arg.Version_4,
 		arg.Version_5,
+		arg.Version_6,
 	)
 	var i GetStatsByVersionRow
 	err := row.Scan(
 		&i.Version,
 		&i.Avgwave,
+		&i.Avgmoneyearned,
 		&i.Maxwave,
 		&i.Numoftestevents,
 		&i.Startdate,

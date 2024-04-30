@@ -191,6 +191,7 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 		}
 		assert.Equal(t, 1, len(data))
 		assert.InDelta(t, float64(10), data[0].Avgwave, float64EqualityThreshold)
+		assert.InDelta(t, float64(10), data[0].Avgmoneyearned, float64EqualityThreshold)
 		assert.Equal(t, int64(10), data[0].Maxwave)
 		assert.Equal(t, int64(1), data[0].Numoftestevents)
 	})
@@ -239,7 +240,7 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 	db.Query(`
         insert into test_results
         (id, moneyEarned, endedAt) values
-        ('3', 10, '2024-02-05 00:00:00')
+        ('3', 11, '2024-02-05 00:00:00')
     `)
 	db.Query(`
         insert into player_test_results (playerId, testResultId, wavesSurvived, diedTo) values
@@ -280,12 +281,14 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 		assert.Equal(t, 2, len(data))
 
 		assert.InDelta(t, float64(15), data[0].Avgwave, float64EqualityThreshold)
+		assert.InDelta(t, float64(10.5), data[0].Avgmoneyearned, float64EqualityThreshold)
 		assert.Equal(t, int64(20), data[0].Maxwave)
 		assert.Equal(t, int64(2), data[0].Numoftestevents)
 		assert.Equal(t, "2024-02-01T00:00:00Z", data[0].Startdate)
 		assert.Equal(t, "2024-02-05T00:00:00Z", data[0].Enddate)
 
 		assert.InDelta(t, float64(10), data[1].Avgwave, float64EqualityThreshold)
+		assert.InDelta(t, float64(10), data[1].Avgmoneyearned, float64EqualityThreshold)
 		assert.Equal(t, int64(10), data[1].Maxwave)
 		assert.Equal(t, int64(1), data[1].Numoftestevents)
 		assert.Equal(t, "2024-01-01T00:00:00Z", data[1].Startdate)
