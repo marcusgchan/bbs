@@ -172,7 +172,7 @@ FROM (
     INNER JOIN test_results ON test_events.testResultId = test_results.id
     WHERE test_events.version = ?
 ) as EndDate
-WHERE Avg.version = MaxWave.version 
+WHERE AvgWave.version = MaxWave.version 
 AND MaxWave.version = Count.version
 AND AvgMoney.version = Count.version
 AND Count.version = StartDate.version

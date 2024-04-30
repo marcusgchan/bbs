@@ -29,9 +29,9 @@ func TransformToStatsProps(singleStats *database.GetStatsByVersionRow, multiStat
 		Multi: &multiStatsProps,
 		Single: &stats.Stats{
 			Version:         singleStats.Version,
-			StartDate:       singleStats.Startdate.String(),
-			EndDate:         singleStats.Enddate.String(),
-			AvgWaveSurvived: fmt.Sprintf("%.2f", singleStats.Avgwave.Float64),
+			StartDate:       singleStats.Startdate,
+			EndDate:         singleStats.Enddate,
+			AvgWaveSurvived: fmt.Sprintf("%.2f", singleStats.Avgwave),
 			HighestWave:     strconv.Itoa(int(singleStats.Maxwave)),
 			Count:           strconv.Itoa(int(singleStats.Numoftestevents)),
 		},
