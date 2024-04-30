@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"database/sql"
 	"fmt"
-	"math"
 	"os"
 	"os/exec"
 	"path"
@@ -184,6 +183,7 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 			Limit_3: limit,
 			Limit_4: limit,
 			Limit_5: limit,
+			Limit_6: limit,
 		})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to execute query %s", err)
@@ -219,12 +219,14 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 			Limit_3: limit,
 			Limit_4: limit,
 			Limit_5: limit,
+			Limit_6: limit,
 		})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to execute query %s", err)
 			os.Exit(1)
 		}
 
+		fmt.Printf("data: %v", data)
 		assert.Equal(t, 2, len(data))
 		assert.InDelta(t, float64(20), data[0].Avgwave, float64EqualityThreshold)
 		assert.Equal(t, int64(20), data[0].Maxwave)
@@ -268,6 +270,7 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 			Limit_3: limit,
 			Limit_4: limit,
 			Limit_5: limit,
+			Limit_6: limit,
 		})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to execute query %s", err)

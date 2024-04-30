@@ -12,7 +12,7 @@ import (
 )
 
 const getMostRecentStats = `-- name: GetMostRecentStats :many
-SELECT Avg.version, Avg.avgWave, Max.maxWave, Count.numOfTestEvents, StartDate.startDate, EndDate.endDate
+SELECT Avg.version, Avg.avgWave, AvgMoney.avgMoneyEarned, Max.maxWave, Count.numOfTestEvents, StartDate.startDate, EndDate.endDate
     FROM (
     SELECT test_events.version, CAST(AVG(player_test_results.wavesSurvived) AS REAL) as avgWave
     FROM (
@@ -36,6 +36,17 @@ SELECT Avg.version, Avg.avgWave, Max.maxWave, Count.numOfTestEvents, StartDate.s
     JOIN player_test_results ON test_events.testResultId = player_test_results.testresultId
     GROUP BY test_events.version
 ) as Max, (
+    SELECT test_events.version, CAST(AVG(test_results.moneyEarned) as REAL) as avgMoneyEarned
+    FROM (
+        SELECT DISTINCT value as version 
+        FROM versions
+        ORDER BY value DESC
+        LIMIT ?
+    ) as S
+    JOIN test_events ON test_events.version = S.version
+    INNER JOIN test_results ON test_events.testResultId = test_results.id
+    GROUP BY test_events.version
+) as AvgMoney, (
     SELECT test_events.version, COUNT(test_events.id) as numOfTestEvents
     FROM (
         SELECT DISTINCT value as version 
@@ -69,6 +80,7 @@ SELECT Avg.version, Avg.avgWave, Max.maxWave, Count.numOfTestEvents, StartDate.s
 ) as EndDate
 WHERE Avg.version = Max.version
 AND Max.version = Count.version 
+AND AvgMoney.version = Count.version
 AND Count.version = StartDate.version 
 AND StartDate.version = EndDate.version
 ORDER BY Avg.version DESC
@@ -80,11 +92,13 @@ type GetMostRecentStatsParams struct {
 	Limit_3 int64
 	Limit_4 int64
 	Limit_5 int64
+	Limit_6 int64
 }
 
 type GetMostRecentStatsRow struct {
 	Version         string
 	Avgwave         float64
+	Avgmoneyearned  float64
 	Maxwave         int64
 	Numoftestevents int64
 	Startdate       string
@@ -98,6 +112,7 @@ func (q *Queries) GetMostRecentStats(ctx context.Context, arg GetMostRecentStats
 		arg.Limit_3,
 		arg.Limit_4,
 		arg.Limit_5,
+		arg.Limit_6,
 	)
 	if err != nil {
 		return nil, err
@@ -109,6 +124,7 @@ func (q *Queries) GetMostRecentStats(ctx context.Context, arg GetMostRecentStats
 		if err := rows.Scan(
 			&i.Version,
 			&i.Avgwave,
+			&i.Avgmoneyearned,
 			&i.Maxwave,
 			&i.Numoftestevents,
 			&i.Startdate,
