@@ -3,6 +3,7 @@ package testevt
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"strconv"
 	"time"
@@ -167,6 +168,7 @@ func (h TestEventHandler) CreatePlayerTestResult(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	fmt.Printf("data %v", data)
 	defer tx.Rollback()
 	// Create general test result
 	createdTestResId, err := qtx.CreateTestResult(c.Request().Context(), database.CreateTestResultParams{
