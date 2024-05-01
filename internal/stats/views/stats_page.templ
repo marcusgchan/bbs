@@ -30,8 +30,8 @@ templ StatsPage(props *StatsPageProps) {
 
 templ StatsContent(props *StatsPageProps) {
 	<h1 class="text-xl">Statistics</h1>
-	<div class="flex gap-2 justify-between flex-wrap-reverse">
-		<section class="space-y-2 flex-1">
+	<div class="gap-2 grid [grid-template-rows:min-content_1fr] [grid-template-columns:1fr_max-content] [grid-template-areas:'filtered-stats_recent-stats''catastrophe-stats_recent-stats']">
+		<section class="flex-1 flex gap-2 [grid-area:filtered-stats]">
 			<div>
 				<label>Select Version</label>
 				<select class="p-2" hx-get="/stats/filtered" hx-trigger="change" hx-target="[data-filtered-stats]" hx-swap="innerHTML" name="version">
@@ -41,10 +41,25 @@ templ StatsContent(props *StatsPageProps) {
 					}
 				</select>
 			</div>
-			<h2 class="text-lg">Filtered Results</h2>
-			@FilteredStats(props.Single)
+			<div>
+				<h2 class="text-lg">Filtered Results</h2>
+				@FilteredStats(props.Single)
+			</div>
 		</section>
-		<section class="space-y-2">
+		<section class="[grid-area:catastrophe-stats]">
+			<div>
+				<h2 class="text-lg">Catastrophe Stats</h2>
+				<select class="p-2" hx-get="/stats/catastrophe" hx-trigger="change" hx-target="[data-recent-stats-list]" hx-swap="innerHTML" name="numberOfVersions" value="3">
+					<option>3</option>
+					<option>4</option>
+					<option>5</option>
+					<option>6</option>
+					<option>7</option>
+					<option>8</option>
+				</select>
+			</div>
+		</section>
+		<section class="space-y-2 [grid-area:recent-stats]">
 			<div class="flex gap-2 justify-between">
 				<h2 class="text-lg">Recent Test Event Statistics</h2>
 				<select class="p-2" hx-get="/stats/latest-versions" hx-trigger="change" hx-target="[data-recent-stats-list]" hx-swap="innerHTML" name="numberOfVersions" value="3">
