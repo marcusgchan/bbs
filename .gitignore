@@ -8,3 +8,6 @@ web/static/*
 
 node_modules
 
+# Local db
+.local
+

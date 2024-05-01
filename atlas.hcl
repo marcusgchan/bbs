@@ -18,7 +18,7 @@ env "turso" {
 }
 
 env "local" {
-    url = "sqlite://.local.db"
+    url = "sqlite://.local/db.db"
     src = "file://database/schema.sql"
     dev  = "sqlite://dev?mode=memory"
 }
