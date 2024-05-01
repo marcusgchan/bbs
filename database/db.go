@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	_ "github.com/tursodatabase/libsql-client-go/libsql"
+	_ "github.com/tursodatabase/go-libsql"
 )
 
 func Connect() *sql.DB {
@@ -13,11 +13,5 @@ func Connect() *sql.DB {
 	if err != nil {
 		log.Fatalf("failed to connect: %v", err)
 	}
-
-	res, err := db.Query("select * from users")
-	if err != nil {
-		log.Fatal(err, res)
-	}
-
 	return db
 }
