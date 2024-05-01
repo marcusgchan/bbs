@@ -61,18 +61,18 @@ templ StatsContent(props *StatsPageProps) {
 	</div>
 }
 
-templ FilteredStats(stats *Stats) {
+templ FilteredStats(props *Stats) {
 	<div data-filtered-stats>
-		if stats == nil {
+		if props == nil {
 			<p>No Results</p>
 		} else {
 			<div>
-				<p>Version: { stats.Version }</p>
-				<p>Start date: { stats.StartDate }</p>
-				<p>End date: { stats.EndDate }</p>
-				<p>Avg wave survived: { stats.AvgWaveSurvived }</p>
-				<p>Highest wave survived: { stats.HighestWave }</p>
-				<p>Total number of test events: { stats.Count }</p>
+				<p>Version: { props.Version }</p>
+				<p>Start date: { props.StartDate }</p>
+				<p>End date: { props.EndDate }</p>
+				<p>Avg wave survived: { props.AvgWaveSurvived }</p>
+				<p>Highest wave survived: { props.HighestWave }</p>
+				<p>Total number of test events: { props.Count }</p>
 			</div>
 		}
 	</div>

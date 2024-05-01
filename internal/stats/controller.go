@@ -2,6 +2,7 @@ package stats
 
 import (
 	"database/sql"
+	"fmt"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
@@ -22,7 +23,7 @@ func (h StatsHandler) StatsPage(c echo.Context) error {
 		limit = 3
 	}
 	version := c.QueryParam("version")
-	var singleStatsRes database.GetStatsByVersionRow
+	singleStatsRes := database.GetStatsByVersionRow{}
 	if version != "" {
 		singleStatsRes, err = h.Q.GetStatsByVersion(c.Request().Context(), database.GetStatsByVersionParams{
 			Version:   version,
@@ -30,6 +31,7 @@ func (h StatsHandler) StatsPage(c echo.Context) error {
 			Version_3: version,
 			Version_4: version,
 			Version_5: version,
+			Version_6: version,
 		})
 		if err != nil && err != sql.ErrNoRows {
 			return err
@@ -41,6 +43,7 @@ func (h StatsHandler) StatsPage(c echo.Context) error {
 		Limit_3: int64(limit),
 		Limit_4: int64(limit),
 		Limit_5: int64(limit),
+		Limit_6: int64(limit),
 	})
 	if err != nil {
 		return err
@@ -67,7 +70,7 @@ func (h StatsHandler) LatestVersions(c echo.Context) error {
 	if !internal.FromHTMX(c) {
 		return internal.Render(sview.NotFoundPage(), c)
 	}
-	numOfVersions, err := strconv.Atoi(c.QueryParam("numverOfVersions"))
+	numOfVersions, err := strconv.Atoi(c.QueryParam("numberOfVersions"))
 	if err != nil || numOfVersions < 3 || numOfVersions > 10 {
 		numOfVersions = 3
 	}
@@ -91,8 +94,14 @@ func (h StatsHandler) FilteredStats(c echo.Context) error {
 	}
 	version := c.QueryParam("version")
 	data, err := h.Q.GetStatsByVersion(c.Request().Context(), database.GetStatsByVersionParams{
-		Version: version,
+		Version:   version,
+		Version_2: version,
+		Version_3: version,
+		Version_4: version,
+		Version_5: version,
+		Version_6: version,
 	})
+	fmt.Printf("data %v | version %v | %v", data, version, err)
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}

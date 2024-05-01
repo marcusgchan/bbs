@@ -49,7 +49,7 @@ func TransformToMultiField(data *[]database.GetMostRecentStatsRow) *[]stats.Stat
 }
 
 func TransformToStatsField(data *database.GetStatsByVersionRow) *stats.Stats {
-	if data == nil {
+	if *data == (database.GetStatsByVersionRow{}) {
 		return nil
 	}
 	return &stats.Stats{
