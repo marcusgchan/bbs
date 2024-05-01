@@ -4,18 +4,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func Seed() {
 	db := Connect()
 	defer db.Close()
-
-	err := godotenv.Load()
-	if err != nil {
-		fmt.Printf("Error loading .env file")
-	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(os.Getenv("PASSWORD")), bcrypt.DefaultCost)
 	if err != nil {
