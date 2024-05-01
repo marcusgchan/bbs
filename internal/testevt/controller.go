@@ -110,7 +110,6 @@ func (h TestEventHandler) CreateTestEvent(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("create test event data: %v", data)
 	tx, err := h.DB.Begin()
 	if err != nil {
 		return err
@@ -179,18 +178,15 @@ func (h TestEventHandler) CreatePlayerTestResult(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	id, err := qtx.UpdateTestEvtWithTestRes(c.Request().Context(), database.UpdateTestEvtWithTestResParams{
+	_, err = qtx.UpdateTestEvtWithTestRes(c.Request().Context(), database.UpdateTestEvtWithTestResParams{
 		Testresultid: sql.NullInt64{Int64: createdTestResId, Valid: true},
 		ID:           data.TestEvtID,
 	})
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return fmt.Errorf("bad %v %v | %v", id, data.TestEvtID, data)
+			return fmt.Errorf("could not find test event with id of %v", data.TestEvtID)
 		}
 		return err
-	}
-	if id != data.TestEvtID {
-		return fmt.Errorf("bad %v %v | %v", id, data.TestEvtID, data)
 	}
 	for _, p := range data.Players {
 		// Create player test result
