@@ -16,10 +16,3 @@ env "turso" {
     src = "file://database/schema.sql"
     dev  = "sqlite://dev?mode=memory"
 }
-
-env "test" {
-    url = "sqlite://.local.db?_fk=1"
-    exclude = ["_litestream*"]
-    src = "file://database/schema.sql"
-    dev  = "sqlite://dev?mode=memory"
-}
