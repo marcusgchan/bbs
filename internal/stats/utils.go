@@ -20,7 +20,7 @@ func TransformToVersionsField(data *[]database.Version) *[]stats.Version {
 }
 
 func TransformToSingleField(data *database.GetStatsByVersionRow) *stats.Stats {
-	if data == nil {
+	if *data == (database.GetStatsByVersionRow{}) {
 		return nil
 	}
 	return &stats.Stats{
