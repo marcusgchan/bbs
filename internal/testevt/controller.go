@@ -178,12 +178,15 @@ func (h TestEventHandler) CreatePlayerTestResult(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	err = qtx.UpdateTestEvtWithTestRes(c.Request().Context(), database.UpdateTestEvtWithTestResParams{
+	id, err := qtx.UpdateTestEvtWithTestRes(c.Request().Context(), database.UpdateTestEvtWithTestResParams{
 		Testresultid: sql.NullInt64{Int64: createdTestResId, Valid: true},
 		ID:           data.TestEvtID,
 	})
 	if err != nil {
 		return err
+	}
+	if id != data.TestEvtID {
+		return fmt.Errorf("bad %v %v | %v", id, data.TestEvtID, data)
 	}
 	for _, p := range data.Players {
 		// Create player test result

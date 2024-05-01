@@ -246,8 +246,8 @@ func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
 	return i, err
 }
 
-const updateTestEvtWithTestRes = `-- name: UpdateTestEvtWithTestRes :exec
-UPDATE test_events SET testResultId = ? WHERE id = ?
+const updateTestEvtWithTestRes = `-- name: UpdateTestEvtWithTestRes :one
+UPDATE test_events SET testResultId = ? WHERE id = ? RETURNING id
 `
 
 type UpdateTestEvtWithTestResParams struct {
@@ -255,7 +255,9 @@ type UpdateTestEvtWithTestResParams struct {
 	ID           string
 }
 
-func (q *Queries) UpdateTestEvtWithTestRes(ctx context.Context, arg UpdateTestEvtWithTestResParams) error {
-	_, err := q.db.ExecContext(ctx, updateTestEvtWithTestRes, arg.Testresultid, arg.ID)
-	return err
+func (q *Queries) UpdateTestEvtWithTestRes(ctx context.Context, arg UpdateTestEvtWithTestResParams) (string, error) {
+	row := q.db.QueryRowContext(ctx, updateTestEvtWithTestRes, arg.Testresultid, arg.ID)
+	var id string
+	err := row.Scan(&id)
+	return id, err
 }
