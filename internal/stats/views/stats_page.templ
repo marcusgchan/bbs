@@ -34,7 +34,7 @@ templ StatsContent(props *StatsPageProps) {
 		<section class="space-y-2 flex-1">
 			<div>
 				<label>Select Version</label>
-				<select class="p-2" hx-get="/stats/filtered" hx-trigger="change" hx-swap="[data-filtered-stats]" hx-swap="innerHTML" name="version">
+				<select class="p-2" hx-get="/stats/filtered" hx-trigger="change" hx-target="[data-filtered-stats]" hx-swap="innerHTML" name="version">
 					<option value="" selected hidden>Select version</option>
 					for _, version := range *props.Versions {
 						<option value={ version.Version }>{ version.Version }</option>
