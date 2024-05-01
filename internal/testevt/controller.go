@@ -110,6 +110,7 @@ func (h TestEventHandler) CreateTestEvent(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	fmt.Printf("create test event data: %v", data)
 	tx, err := h.DB.Begin()
 	if err != nil {
 		return err
