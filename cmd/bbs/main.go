@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -25,6 +26,13 @@ func main() {
 	if err != nil {
 		log.Printf("Error loading .env file")
 	}
+
+	if len(os.Args) > 1 && os.Args[1] == "seed" {
+		fmt.Print("Seeding...")
+		database.Seed()
+		return
+	}
+
 	app := echo.New()
 	db := database.Connect()
 	q := slqc.New(db)
