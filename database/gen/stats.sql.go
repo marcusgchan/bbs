@@ -219,3 +219,30 @@ func (q *Queries) GetStatsByVersion(ctx context.Context, arg GetStatsByVersionPa
 	)
 	return i, err
 }
+
+const getVersions = `-- name: GetVersions :many
+SELECT value, createdat FROM versions
+`
+
+func (q *Queries) GetVersions(ctx context.Context) ([]Version, error) {
+	rows, err := q.db.QueryContext(ctx, getVersions)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Version
+	for rows.Next() {
+		var i Version
+		if err := rows.Scan(&i.Value, &i.Createdat); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

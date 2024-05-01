@@ -8,37 +8,32 @@ import (
 	stats "github.com/marcusgchan/bbs/internal/stats/views"
 )
 
-func TransformSingleAndMultiToStatsProps(singleStats *database.GetStatsByVersionRow, multiStats *[]database.GetMostRecentStatsRow) *stats.StatsPageProps {
-	multiStatsProps := make([]stats.Stats, len(*multiStats))
-	for i, s := range *multiStats {
-		multiStatsProps[i] = stats.Stats{
-			Version:         s.Version,
-			StartDate:       s.Startdate,
-			EndDate:         s.Enddate,
-			AvgWaveSurvived: fmt.Sprintf("%f.2", s.Avgwave),
-			HighestWave:     strconv.Itoa(int(s.Maxwave)),
-			Count:           strconv.Itoa(int(s.Numoftestevents)),
+func TransformToVersionsField(data *[]database.Version) *[]stats.Version {
+	versions := make([]stats.Version, len(*data))
+	for i, v := range *data {
+		versions[i] = stats.Version{
+			Version:   v.Value,
+			CreatedAt: v.Createdat.Time.String(),
 		}
 	}
-	if singleStats == nil {
-		return &stats.StatsPageProps{
-			Multi: &multiStatsProps,
-		}
+	return &versions
+}
+
+func TransformToSingleField(data *database.GetStatsByVersionRow) *stats.Stats {
+	if data == nil {
+		return nil
 	}
-	return &stats.StatsPageProps{
-		Multi: &multiStatsProps,
-		Single: &stats.Stats{
-			Version:         singleStats.Version,
-			StartDate:       singleStats.Startdate,
-			EndDate:         singleStats.Enddate,
-			AvgWaveSurvived: fmt.Sprintf("%.2f", singleStats.Avgwave),
-			HighestWave:     strconv.Itoa(int(singleStats.Maxwave)),
-			Count:           strconv.Itoa(int(singleStats.Numoftestevents)),
-		},
+	return &stats.Stats{
+		Version:         data.Version,
+		StartDate:       data.Startdate,
+		EndDate:         data.Enddate,
+		AvgWaveSurvived: fmt.Sprintf("%.2f", data.Avgwave),
+		HighestWave:     strconv.Itoa(int(data.Maxwave)),
+		Count:           strconv.Itoa(int(data.Numoftestevents)),
 	}
 }
 
-func TransformMultiToStats(data *[]database.GetMostRecentStatsRow) *[]stats.Stats {
+func TransformToMultiField(data *[]database.GetMostRecentStatsRow) *[]stats.Stats {
 	s := make([]stats.Stats, len(*data))
 	for i, v := range *data {
 		s[i] = stats.Stats{
@@ -51,4 +46,18 @@ func TransformMultiToStats(data *[]database.GetMostRecentStatsRow) *[]stats.Stat
 		}
 	}
 	return &s
+}
+
+func TransformToStatsField(data *database.GetStatsByVersionRow) *stats.Stats {
+	if data == nil {
+		return nil
+	}
+	return &stats.Stats{
+		Version:         data.Version,
+		StartDate:       data.Startdate,
+		EndDate:         data.Enddate,
+		AvgWaveSurvived: fmt.Sprintf("%.2f", data.Avgwave),
+		HighestWave:     strconv.Itoa(int(data.Maxwave)),
+		Count:           strconv.Itoa(int(data.Numoftestevents)),
+	}
 }

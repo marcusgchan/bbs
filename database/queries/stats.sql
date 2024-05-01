@@ -108,3 +108,6 @@ AND MaxWave.version = Count.version
 AND AvgMoney.version = Count.version
 AND Count.version = StartDate.version
 AND StartDate.version = EndDate.version;
+
+-- name: GetVersions :many
+SELECT * FROM versions;

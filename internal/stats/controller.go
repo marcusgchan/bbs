@@ -22,9 +22,9 @@ func (h StatsHandler) StatsPage(c echo.Context) error {
 		limit = 3
 	}
 	version := c.QueryParam("version")
-	var singleStatsResP *database.GetStatsByVersionRow
-	if version == "" {
-		singleStatsRes, err := h.Q.GetStatsByVersion(c.Request().Context(), database.GetStatsByVersionParams{
+	var singleStatsRes database.GetStatsByVersionRow
+	if version != "" {
+		singleStatsRes, err = h.Q.GetStatsByVersion(c.Request().Context(), database.GetStatsByVersionParams{
 			Version:   version,
 			Version_2: version,
 			Version_3: version,
@@ -33,9 +33,6 @@ func (h StatsHandler) StatsPage(c echo.Context) error {
 		})
 		if err != nil && err != sql.ErrNoRows {
 			return err
-		}
-		if err != sql.ErrNoRows {
-			singleStatsResP = &singleStatsRes
 		}
 	}
 	muliStatsRes, err := h.Q.GetMostRecentStats(c.Request().Context(), database.GetMostRecentStatsParams{
@@ -49,10 +46,21 @@ func (h StatsHandler) StatsPage(c echo.Context) error {
 		return err
 	}
 
-	if internal.FromHTMX(c) {
-		return internal.Render(stats.StatsContent(TransformSingleAndMultiToStatsProps(singleStatsResP, &muliStatsRes)), c)
+	versions, err := h.Q.GetVersions(c.Request().Context())
+	if err != nil {
+		return err
 	}
-	return internal.Render(stats.StatsPage(TransformSingleAndMultiToStatsProps(singleStatsResP, &muliStatsRes)), c)
+
+	statsProps := stats.StatsPageProps{
+		Single:   TransformToSingleField(&singleStatsRes),
+		Multi:    TransformToMultiField(&muliStatsRes),
+		Versions: TransformToVersionsField(&versions),
+	}
+
+	if internal.FromHTMX(c) {
+		return internal.Render(stats.StatsContent(&statsProps), c)
+	}
+	return internal.Render(stats.StatsPage(&statsProps), c)
 }
 
 func (h StatsHandler) LatestVersions(c echo.Context) error {
@@ -74,5 +82,19 @@ func (h StatsHandler) LatestVersions(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return internal.Render(stats.LatestVersionsList(TransformMultiToStats(&data)), c)
+	return internal.Render(stats.RecentStatsList(TransformToMultiField(&data)), c)
+}
+
+func (h StatsHandler) FilteredStats(c echo.Context) error {
+	if !internal.FromHTMX(c) {
+		return internal.Render(sview.NotFoundPage(), c)
+	}
+	version := c.QueryParam("version")
+	data, err := h.Q.GetStatsByVersion(c.Request().Context(), database.GetStatsByVersionParams{
+		Version: version,
+	})
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
+	return internal.Render(stats.FilteredStats(TransformToStatsField(&data)), c)
 }
