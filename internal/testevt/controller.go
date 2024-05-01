@@ -183,6 +183,9 @@ func (h TestEventHandler) CreatePlayerTestResult(c echo.Context) error {
 		ID:           data.TestEvtID,
 	})
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return fmt.Errorf("bad %v %v | %v", id, data.TestEvtID, data)
+		}
 		return err
 	}
 	if id != data.TestEvtID {
