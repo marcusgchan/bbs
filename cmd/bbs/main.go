@@ -63,6 +63,7 @@ func main() {
 	statsGroup.GET("", statsHandler.StatsPage)
 	statsGroup.GET("/latest-versions", statsHandler.LatestVersions)
 	statsGroup.GET("/filtered", statsHandler.FilteredStats)
+	statsGroup.GET("/catastrophes", statsHandler.CatastropheDeaths)
 
 	app.GET("/*", func(c echo.Context) error {
 		return internal.Render(sview.NotFoundPage(), c)

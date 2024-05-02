@@ -2,7 +2,6 @@ package stats
 
 import (
 	"database/sql"
-	"fmt"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
@@ -67,8 +66,6 @@ func (h StatsHandler) StatsPage(c echo.Context) error {
 		CatastropheDeaths: TransformToCatastropheField(&catData),
 	}
 
-	fmt.Printf("data: %v", statsProps.CatastropheDeaths)
-
 	if internal.FromHTMX(c) {
 		return internal.Render(stats.StatsContent(&statsProps), c)
 	}
@@ -110,9 +107,25 @@ func (h StatsHandler) FilteredStats(c echo.Context) error {
 		Version_5: version,
 		Version_6: version,
 	})
-	fmt.Printf("data %v | version %v | %v", data, version, err)
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
 	return internal.Render(stats.FilteredStats(TransformToStatsField(&data)), c)
+}
+
+func (h StatsHandler) CatastropheDeaths(c echo.Context) error {
+	if !internal.FromHTMX(c) {
+		return internal.Render(sview.NotFoundPage(), c)
+	}
+	count, err := strconv.Atoi(c.QueryParam("count"))
+	if err != nil || count < 1 || count > 10 {
+		count = 3
+	}
+
+	data, err := h.Q.GetCatastropheKills(c.Request().Context(), int64(count))
+	if err != nil {
+		return err
+	}
+
+	return internal.Render(stats.CatastropheStatsList(TransformToCatastropheField(&data)), c)
 }

@@ -37,9 +37,10 @@ templ StatsPage(props *StatsPageProps) {
 }
 
 templ StatsContent(props *StatsPageProps) {
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<h1 class="text-xl">Statistics</h1>
-	<div class="gap-2 grid [grid-template-rows:min-content_1fr] [grid-template-columns:1fr_fit-content] [grid-template-areas:'filtered-stats_recent-stats''catastrophe-stats_recent-stats']">
-		<section class="flex-1 flex gap-2 [grid-area:filtered-stats]">
+	<div class="gap-2 grid [grid-template-rows:min-content_1fr] [grid-template-columns:1fr_max-content] [grid-template-areas:'filtered-stats_recent-stats''catastrophe-stats_recent-stats']">
+		<section class="flex-1 flex gap-2 [grid-area:filtered-stats] min-h-52">
 			<div>
 				<label>Select Version</label>
 				<select class="p-2" hx-get="/stats/filtered" hx-trigger="change" hx-target="[data-filtered-stats]" hx-swap="innerHTML" name="version">
@@ -57,7 +58,7 @@ templ StatsContent(props *StatsPageProps) {
 		<section class="[grid-area:catastrophe-stats] min-w-0">
 			<div class="flex gap-2">
 				<h2 class="text-lg">Catastrophe Stats</h2>
-				<select class="p-2" hx-get="/stats/catastrophe" hx-trigger="change" hx-target="[data-recent-stats-list]" hx-swap="innerHTML" name="numberOfVersions" value="3">
+				<select class="p-2" hx-get="/stats/catastrophes" hx-trigger="change" hx-target="[data-catastrophe-stats-list]" hx-swap="innerHTML" name="count" value="3">
 					<option>3</option>
 					<option>4</option>
 					<option>5</option>
@@ -66,15 +67,10 @@ templ StatsContent(props *StatsPageProps) {
 					<option>8</option>
 				</select>
 			</div>
-			for _, v := range *props.CatastropheDeaths {
-				<h3 class="text-lg">{ v.Version }</h3>
-				<div class="w-full">
-					<canvas class="w-full" id={ "catastrophe-deaths-" + v.Version }></canvas>
-				</div>
-			}
+			@CatastropheStatsList(props.CatastropheDeaths)
 		</section>
 		<section class="space-y-2 [grid-area:recent-stats]">
-			<div class="flex gap-2 justify-between">
+			<div class="flex gap-2">
 				<h2 class="text-lg">Recent Test Event Statistics</h2>
 				<select class="p-2" hx-get="/stats/latest-versions" hx-trigger="change" hx-target="[data-recent-stats-list]" hx-swap="innerHTML" name="numberOfVersions" value="3">
 					<option>3</option>
@@ -88,34 +84,46 @@ templ StatsContent(props *StatsPageProps) {
 			@RecentStatsList(props.Multi)
 		</section>
 	</div>
-	@graph(*props.CatastropheDeaths)
-	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+}
+
+templ CatastropheStatsList(props *[]CatastropheDeaths) {
+	<section data-catastrophe-stats-list>
+		for _, v := range *props {
+			<h3 class="text-lg">{ v.Version }</h3>
+			<div class="w-full">
+				<canvas class="w-full" id={ "catastrophe-deaths-" + v.Version }></canvas>
+			</div>
+		}
+	</section>
+	@graph(*props)
 }
 
 script graph(data []CatastropheDeaths) {
-    for (const {Version, Catastrophies, Deaths} of data) {
-        const ctx = document.getElementById('catastrophe-deaths-' + Version);
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: Catastrophies,
-                datasets: [{
-                    label: '# of Deaths',
-                    data: Deaths,
-                    borderWidth: 1
-              }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true
+    requestAnimationFrame( () => {
+        for (const {Version, Catastrophies, Deaths} of data) {
+            const ctx = document.getElementById('catastrophe-deaths-' + Version);
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Catastrophies,
+                    datasets: [{
+                        label: '# of Deaths',
+                        data: Deaths,
+                        borderWidth: 1
+                  }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
                     }
                 }
-            }
-        }); 
-    }
+            }); 
+        }
+    })
 }
 
 templ FilteredStats(props *Stats) {
