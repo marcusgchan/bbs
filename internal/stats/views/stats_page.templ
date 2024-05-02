@@ -39,11 +39,11 @@ templ StatsPage(props *StatsPageProps) {
 templ StatsContent(props *StatsPageProps) {
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<h1 class="text-xl">Statistics</h1>
-	<div class="gap-2 grid [grid-template-rows:min-content_1fr] [grid-template-columns:1fr_max-content] [grid-template-areas:'filtered-stats_recent-stats''catastrophe-stats_recent-stats']">
-		<section class="flex-1 flex gap-2 [grid-area:filtered-stats] min-h-52">
+	<div class="gap-2 grid [grid-template-rows:min-content_1fr] [grid-template-columns:1fr_max-content] [grid-template-areas:'catastrophe-stats_recent-stats''filtered-stats_recent-stats']">
+		<section class="flex-1 flex gap-2 [grid-area:filtered-stats]">
 			<div>
 				<label>Select Version</label>
-				<select class="p-2" hx-get="/stats/filtered" hx-trigger="change" hx-target="[data-filtered-stats]" hx-swap="innerHTML" name="version">
+				<select class="p-2" hx-get="/stats/filtered" hx-trigger="change" hx-target="[data-filtered-stats]" hx-swap="innerHTML" name="version" hx-push-url="true">
 					<option value="" selected hidden>Select version</option>
 					for _, version := range *props.Versions {
 						<option value={ version.Version }>{ version.Version }</option>
@@ -99,7 +99,7 @@ templ CatastropheStatsList(props *[]CatastropheDeaths) {
 }
 
 script graph(data []CatastropheDeaths) {
-    requestAnimationFrame( () => {
+    requestAnimationFrame(() => {
         for (const {Version, Catastrophies, Deaths} of data) {
             const ctx = document.getElementById('catastrophe-deaths-' + Version);
             new Chart(ctx, {
