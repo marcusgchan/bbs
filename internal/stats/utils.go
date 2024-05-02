@@ -63,36 +63,45 @@ func TransformToStatsField(data *database.GetStatsByVersionRow) *stats.Stats {
 }
 
 func TransformToCatastropheField(data *[]database.GetCatastropheKillsRow) *[]stats.CatastropheDeaths {
-	res := make([]stats.CatastropheDeaths, 1)
-
+	res := []stats.CatastropheDeaths{}
 	prevVer := ""
 	var cur *stats.CatastropheDeaths
 
 	for _, row := range *data {
+		fmt.Printf("ver: %v\n", row.Version)
+		fmt.Printf("prev ver |%v|\n", prevVer)
 		if prevVer != row.Version {
+			fmt.Printf("ver not the same. cur |%v|\n", cur)
 			if cur != nil {
+				fmt.Printf("appending prev content to array %v\n", *cur)
 				res = append(res, *cur)
 			}
 
 			cur = &stats.CatastropheDeaths{
-				Version:     row.Version,
-				Data:        map[string]int{},
-				TotalDeaths: 0,
+				Version:       row.Version,
+				Catastrophies: []string{},
+				Deaths:        []int{},
+				TotalDeaths:   0,
 			}
 			prevVer = row.Version
 
-			cur.Data[row.Catastrophe] = int(row.Deaths)
+			cur.Catastrophies = append(cur.Catastrophies, row.Catastrophe)
+			cur.Deaths = append(cur.Deaths, int(row.Deaths))
 			cur.TotalDeaths += int(row.Deaths)
+			fmt.Printf("data in loop: %v\n", res)
 			continue
 		}
 
-		cur.Data[row.Catastrophe] = int(row.Deaths)
+		cur.Catastrophies = append(cur.Catastrophies, row.Catastrophe)
+		cur.Deaths = append(cur.Deaths, int(row.Deaths))
 		cur.TotalDeaths += int(row.Deaths)
 	}
 
 	if cur != nil {
+		fmt.Printf("appending prev content to array %v\n", *cur)
 		res = append(res, *cur)
 	}
+	fmt.Printf("data out loop: %v\n", res)
 
 	return &res
 }

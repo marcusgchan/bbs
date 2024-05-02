@@ -1,7 +1,6 @@
 package stats
 
 import "github.com/marcusgchan/bbs/internal/sview"
-import "strconv"
 
 type Stats struct {
 	Version         string
@@ -13,9 +12,10 @@ type Stats struct {
 }
 
 type CatastropheDeaths struct {
-	Version     string
-	Data        map[string]int
-	TotalDeaths int
+	Version       string
+	Catastrophies []string
+	Deaths        []int
+	TotalDeaths   int
 }
 
 type StatsPageProps struct {
@@ -38,7 +38,7 @@ templ StatsPage(props *StatsPageProps) {
 
 templ StatsContent(props *StatsPageProps) {
 	<h1 class="text-xl">Statistics</h1>
-	<div class="gap-2 grid [grid-template-rows:min-content_1fr] [grid-template-columns:1fr_max-content] [grid-template-areas:'filtered-stats_recent-stats''catastrophe-stats_recent-stats']">
+	<div class="gap-2 grid [grid-template-rows:min-content_1fr] [grid-template-columns:1fr_fit-content] [grid-template-areas:'filtered-stats_recent-stats''catastrophe-stats_recent-stats']">
 		<section class="flex-1 flex gap-2 [grid-area:filtered-stats]">
 			<div>
 				<label>Select Version</label>
@@ -54,26 +54,24 @@ templ StatsContent(props *StatsPageProps) {
 				@FilteredStats(props.Single)
 			</div>
 		</section>
-		<section class="[grid-area:catastrophe-stats]">
-			<h2 class="text-lg">Catastrophe Stats</h2>
-			<select class="p-2" hx-get="/stats/catastrophe" hx-trigger="change" hx-target="[data-recent-stats-list]" hx-swap="innerHTML" name="numberOfVersions" value="3">
-				<option>3</option>
-				<option>4</option>
-				<option>5</option>
-				<option>6</option>
-				<option>7</option>
-				<option>8</option>
-			</select>
-			<ul>
-				for _, r := range *props.CatastropheDeaths {
-					<li>
-						<h3>Version { r.Version }</h3>
-						for c, count := range r.Data {
-							<p>{ c }: { strconv.Itoa(count) }</p>
-						}
-					</li>
-				}
-			</ul>
+		<section class="[grid-area:catastrophe-stats] min-w-0">
+			<div class="flex gap-2">
+				<h2 class="text-lg">Catastrophe Stats</h2>
+				<select class="p-2" hx-get="/stats/catastrophe" hx-trigger="change" hx-target="[data-recent-stats-list]" hx-swap="innerHTML" name="numberOfVersions" value="3">
+					<option>3</option>
+					<option>4</option>
+					<option>5</option>
+					<option>6</option>
+					<option>7</option>
+					<option>8</option>
+				</select>
+			</div>
+			for _, v := range *props.CatastropheDeaths {
+				<h3 class="text-lg">{ v.Version }</h3>
+				<div class="w-full">
+					<canvas class="w-full" id={ "catastrophe-deaths-" + v.Version }></canvas>
+				</div>
+			}
 		</section>
 		<section class="space-y-2 [grid-area:recent-stats]">
 			<div class="flex gap-2 justify-between">
@@ -90,6 +88,34 @@ templ StatsContent(props *StatsPageProps) {
 			@RecentStatsList(props.Multi)
 		</section>
 	</div>
+	@graph(*props.CatastropheDeaths)
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+}
+
+script graph(data []CatastropheDeaths) {
+    for (const {Version, Catastrophies, Deaths} of data) {
+        const ctx = document.getElementById('catastrophe-deaths-' + Version);
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Catastrophies,
+                datasets: [{
+                    label: '# of Deaths',
+                    data: Deaths,
+                    borderWidth: 1
+              }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        }); 
+    }
 }
 
 templ FilteredStats(props *Stats) {
