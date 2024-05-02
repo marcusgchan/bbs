@@ -61,3 +61,38 @@ func TransformToStatsField(data *database.GetStatsByVersionRow) *stats.Stats {
 		Count:           strconv.Itoa(int(data.Numoftestevents)),
 	}
 }
+
+func TransformToCatastropheField(data *[]database.GetCatastropheKillsRow) *[]stats.CatastropheDeaths {
+	res := make([]stats.CatastropheDeaths, 1)
+
+	prevVer := ""
+	var cur *stats.CatastropheDeaths
+
+	for _, row := range *data {
+		if prevVer != row.Version {
+			if cur != nil {
+				res = append(res, *cur)
+			}
+
+			cur = &stats.CatastropheDeaths{
+				Version:     row.Version,
+				Data:        map[string]int{},
+				TotalDeaths: 0,
+			}
+			prevVer = row.Version
+
+			cur.Data[row.Catastrophe] = int(row.Deaths)
+			cur.TotalDeaths += int(row.Deaths)
+			continue
+		}
+
+		cur.Data[row.Catastrophe] = int(row.Deaths)
+		cur.TotalDeaths += int(row.Deaths)
+	}
+
+	if cur != nil {
+		res = append(res, *cur)
+	}
+
+	return &res
+}

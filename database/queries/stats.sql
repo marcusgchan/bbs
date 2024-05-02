@@ -111,3 +111,16 @@ AND StartDate.version = EndDate.version;
 
 -- name: GetVersions :many
 SELECT * FROM versions;
+
+-- name: GetCatastropheKills :many
+SELECT test_events.version, player_test_results.diedTo as catastrophe, COUNT(*) as deaths
+FROM (
+    SELECT DISTINCT value as version FROM versions
+    ORDER BY value DESC
+    LIMIT ?
+) as S
+JOIN test_events ON test_events.version = S.version
+INNER JOIN test_results ON test_events.testResultId = test_results.id
+JOIN player_test_results ON test_events.testResultId = player_test_results.testresultId
+GROUP BY test_events.version, player_test_results.diedTo
+ORDER BY test_events.version DESC, player_test_results.diedTo ASC;

@@ -253,10 +253,6 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 
 	// No test result
 	db.Query(`
-        insert into player_test_results (playerId, testResultId, wavesSurvived, diedTo) values
-        ('1', '4', 10, 'Bombs From Above')
-    `)
-	db.Query(`
         insert into test_events
         (id, environment, difficulty, templateId, startedAt, version) values
         ('4', 'lab', 'normal', '1', '2024-02-20 00:00:00', '2.0.0')

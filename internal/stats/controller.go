@@ -54,11 +54,20 @@ func (h StatsHandler) StatsPage(c echo.Context) error {
 		return err
 	}
 
-	statsProps := stats.StatsPageProps{
-		Single:   TransformToSingleField(&singleStatsRes),
-		Multi:    TransformToMultiField(&muliStatsRes),
-		Versions: TransformToVersionsField(&versions),
+	n := 3
+	catData, err := h.Q.GetCatastropheKills(c.Request().Context(), int64(n))
+	if err != nil {
+		return err
 	}
+
+	statsProps := stats.StatsPageProps{
+		Single:            TransformToSingleField(&singleStatsRes),
+		Multi:             TransformToMultiField(&muliStatsRes),
+		Versions:          TransformToVersionsField(&versions),
+		CatastropheDeaths: TransformToCatastropheField(&catData),
+	}
+
+	fmt.Printf("data: %v", statsProps.CatastropheDeaths)
 
 	if internal.FromHTMX(c) {
 		return internal.Render(stats.StatsContent(&statsProps), c)

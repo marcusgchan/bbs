@@ -9,6 +9,49 @@ import (
 	"context"
 )
 
+const getCatastropheKills = `-- name: GetCatastropheKills :many
+SELECT test_events.version, player_test_results.diedTo as catastrophe, COUNT(*) as deaths
+FROM (
+    SELECT DISTINCT value as version FROM versions
+    ORDER BY value DESC
+    LIMIT ?
+) as S
+JOIN test_events ON test_events.version = S.version
+INNER JOIN test_results ON test_events.testResultId = test_results.id
+JOIN player_test_results ON test_events.testResultId = player_test_results.testresultId
+GROUP BY test_events.version, player_test_results.diedTo
+ORDER BY test_events.version DESC, player_test_results.diedTo ASC
+`
+
+type GetCatastropheKillsRow struct {
+	Version     string
+	Catastrophe string
+	Deaths      int64
+}
+
+func (q *Queries) GetCatastropheKills(ctx context.Context, limit int64) ([]GetCatastropheKillsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getCatastropheKills, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetCatastropheKillsRow
+	for rows.Next() {
+		var i GetCatastropheKillsRow
+		if err := rows.Scan(&i.Version, &i.Catastrophe, &i.Deaths); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getMostRecentStats = `-- name: GetMostRecentStats :many
 SELECT AvgWave.version, AvgWave.avgWave, AvgMoney.avgMoneyEarned, MaxWave.maxWave, Count.numOfTestEvents, StartDate.startDate, EndDate.endDate
     FROM (

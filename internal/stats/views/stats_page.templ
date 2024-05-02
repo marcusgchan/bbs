@@ -1,6 +1,7 @@
 package stats
 
 import "github.com/marcusgchan/bbs/internal/sview"
+import "strconv"
 
 type Stats struct {
 	Version         string
@@ -11,10 +12,17 @@ type Stats struct {
 	EndDate         string
 }
 
+type CatastropheDeaths struct {
+	Version     string
+	Data        map[string]int
+	TotalDeaths int
+}
+
 type StatsPageProps struct {
-	Single   *Stats
-	Multi    *[]Stats
-	Versions *[]Version
+	Single            *Stats
+	Multi             *[]Stats
+	Versions          *[]Version
+	CatastropheDeaths *[]CatastropheDeaths
 }
 
 type Version struct {
@@ -47,17 +55,25 @@ templ StatsContent(props *StatsPageProps) {
 			</div>
 		</section>
 		<section class="[grid-area:catastrophe-stats]">
-			<div>
-				<h2 class="text-lg">Catastrophe Stats</h2>
-				<select class="p-2" hx-get="/stats/catastrophe" hx-trigger="change" hx-target="[data-recent-stats-list]" hx-swap="innerHTML" name="numberOfVersions" value="3">
-					<option>3</option>
-					<option>4</option>
-					<option>5</option>
-					<option>6</option>
-					<option>7</option>
-					<option>8</option>
-				</select>
-			</div>
+			<h2 class="text-lg">Catastrophe Stats</h2>
+			<select class="p-2" hx-get="/stats/catastrophe" hx-trigger="change" hx-target="[data-recent-stats-list]" hx-swap="innerHTML" name="numberOfVersions" value="3">
+				<option>3</option>
+				<option>4</option>
+				<option>5</option>
+				<option>6</option>
+				<option>7</option>
+				<option>8</option>
+			</select>
+			<ul>
+				for _, r := range *props.CatastropheDeaths {
+					<li>
+						<h3>Version { r.Version }</h3>
+						for c, count := range r.Data {
+							<p>{ c }: { strconv.Itoa(count) }</p>
+						}
+					</li>
+				}
+			</ul>
 		</section>
 		<section class="space-y-2 [grid-area:recent-stats]">
 			<div class="flex gap-2 justify-between">

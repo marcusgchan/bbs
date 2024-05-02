@@ -73,14 +73,25 @@ func Seed() {
         ('3', 'lab', 'normal', '1', '3', '2024-02-01 00:00:01', '2.0.0')
     `)
 
-	// No test result
+	db.Query(`
+        insert into test_results
+        (id, moneyEarned, endedAt) values
+        ('4', 11, '2024-02-05 00:00:00')
+    `)
 	db.Query(`
         insert into player_test_results (playerId, testResultId, wavesSurvived, diedTo) values
-        ('1', '4', 10, 'Bombs From Above')
+        ('1', '4', 10, 'Acid')
     `)
 	db.Query(`
         insert into test_events
+        (id, environment, difficulty, templateId, testResultId, startedAt, version) values
+        ('4', 'lab', 'normal', '1', '4', '2024-02-01 00:00:01', '2.0.0')
+    `)
+
+	// No test result
+	db.Query(`
+        insert into test_events
         (id, environment, difficulty, templateId, startedAt, version) values
-        ('4', 'lab', 'normal', '1', '2024-02-20 00:00:00', '2.0.0')
+        ('5', 'lab', 'normal', '1', '2024-02-20 00:00:00', '2.0.0')
     `)
 }
