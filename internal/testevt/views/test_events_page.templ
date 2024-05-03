@@ -52,6 +52,7 @@ templ TestEvtRows(props []TestEvtProps, nextPage int) {
 				if i == len(props) - 1 {
 					hx-get={ string(templ.URL(fmt.Sprintf("/test-events?infinite=true&page=%d", nextPage))) }
 					hx-swap="afterend"
+					hx-push-url="false"
 					hx-trigger="revealed"
 					hx-target="closest tr"
 				}

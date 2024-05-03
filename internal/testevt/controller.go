@@ -40,13 +40,17 @@ func (h TestEventHandler) TestEvtPage(c echo.Context) error {
 			return internal.Render(views.TestEvtContent(TransformToTestEvtProps(data), page+1), c)
 		}
 		limit := pageSize
-		offset := (page - 1) * limit
+		offset := (page - 1) * pageSize
 		data, err := h.Q.GetTestEvts(c.Request().Context(), database.GetTestEvtsParams{
 			Limit:  int64(limit),
 			Offset: int64(offset),
 		})
 		if err != nil {
 			return err
+		}
+
+		if len(data) != 0 {
+			c.Response().Header().Set("HX-Push-Url", "?page="+strconv.Itoa(page))
 		}
 		return internal.Render(views.TestEvtRows(TransformToTestEvtProps(data), page+1), c)
 	}
@@ -60,6 +64,7 @@ func (h TestEventHandler) TestEvtPage(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+
 	return internal.Render(views.TestEvtPage(TransformToTestEvtProps(data), page+1), c)
 }
 

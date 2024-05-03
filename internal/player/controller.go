@@ -50,6 +50,9 @@ func (h PlayerHandler) PlayerListPage(c echo.Context) error {
 			return err
 		}
 
+		if len(data) != 0 {
+			c.Response().Header().Set("HX-Push-Url", "?page="+strconv.Itoa(page))
+		}
 		return internal.Render(player.PlayerRows(TransformToPlayerProps(data), page+1), c)
 	}
 
@@ -62,6 +65,7 @@ func (h PlayerHandler) PlayerListPage(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+
 	return internal.Render(player.PlayersPage(TransformToPlayerProps(data), page+1), c)
 }
 
