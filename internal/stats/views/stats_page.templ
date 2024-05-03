@@ -117,7 +117,7 @@ templ CatastropheStatsList(props *[]CatastropheDeaths) {
 		for _, v := range *props {
 			<h3 class="text-lg">{ v.Version }</h3>
 			<div class="w-full">
-				<canvas id={ "catastrophe-deaths-" + v.Version }></canvas>
+				<canvas class="h-80" id={ "catastrophe-deaths-" + v.Version }></canvas>
 			</div>
 		}
 	</section>
