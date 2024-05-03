@@ -42,7 +42,7 @@ templ StatsContent(props *StatsPageProps) {
 		<section class="flex-1 flex gap-2 [grid-area:filtered-stats]">
 			<div>
 				<label>Select Version</label>
-				<select class="p-2" hx-get="/stats/filtered" hx-trigger="change" hx-target="[data-filtered-stats]" hx-swap="innerHTML" name="version" hx-push-url="true">
+				<select hx-get="/stats" hx-trigger="change" hx-trigger="change" class="p-2" hx-target="[data-filtered-stats]" hx-swap="innerHTML" name="version">
 					<option value="" selected hidden>Select version</option>
 					for _, version := range *props.Versions {
 						<option value={ version.Version }>{ version.Version }</option>
@@ -57,7 +57,7 @@ templ StatsContent(props *StatsPageProps) {
 		<section class="[grid-area:catastrophe-stats] min-w-0">
 			<div class="flex gap-2">
 				<h2 class="text-lg">Catastrophe Stats</h2>
-				<select class="p-2" hx-get="/stats/catastrophes" hx-trigger="change" hx-target="[data-catastrophe-stats-list]" hx-swap="innerHTML" name="count" value="3">
+				<select class="p-2" hx-get="/stats" hx-trigger="change" hx-target="[data-catastrophe-stats-list]" hx-swap="innerHTML" name="numberOfVersionsForCatastrophe" value="3">
 					<option>3</option>
 					<option>4</option>
 					<option>5</option>
@@ -71,7 +71,7 @@ templ StatsContent(props *StatsPageProps) {
 		<section class="space-y-2 [grid-area:recent-stats]">
 			<div class="flex gap-2">
 				<h2 class="text-lg">Recent Test Event Statistics</h2>
-				<select class="p-2" hx-get="/stats/latest-versions" hx-trigger="change" hx-target="[data-recent-stats-list]" hx-swap="innerHTML" name="numberOfVersions" value="3">
+				<select class="p-2" hx-target="[data-recent-stats-list]" hx-get="/stats" hx-trigger="change" hx-swap="innerHTML" name="numberOfVersionsForTestEvent" value="3">
 					<option>3</option>
 					<option>4</option>
 					<option>5</option>

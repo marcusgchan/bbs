@@ -105,3 +105,19 @@ func TransformToCatastropheField(data *[]database.GetCatastropheKillsRow) *[]sta
 
 	return &res
 }
+
+func parseCatastropheQueryParams(params string) int {
+	val, err := strconv.Atoi(params)
+	if err != nil || val < 1 || val > 10 {
+		val = 3
+	}
+	return val
+}
+
+func parseTestEventQueryParams(params string) int {
+	val, err := strconv.Atoi(params)
+	if err != nil || val < 3 || val > 10 {
+		val = 3
+	}
+	return val
+}

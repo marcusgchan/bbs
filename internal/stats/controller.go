@@ -2,6 +2,7 @@ package stats
 
 import (
 	"database/sql"
+	"net/url"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
@@ -17,12 +18,109 @@ type StatsHandler struct {
 }
 
 func (h StatsHandler) StatsPage(c echo.Context) error {
-	limit, err := strconv.Atoi(c.QueryParam("numberOfVersions"))
+	reqType := c.Request().Header.Get("HX-Trigger-Name")
+	var err error
+	switch reqType {
+	case "numberOfVersionsForTestEvent":
+		err = recentTestEvents(h, c)
+	case "numberOfVersionsForCatastrophe":
+		err = catastrophe(h, c)
+	case "version":
+		err = testEvent(h, c)
+	default:
+		err = normalStatsPageReq(h, c)
+	}
+	return err
+}
+
+func recentTestEvents(h StatsHandler, c echo.Context) error {
+	if !internal.FromHTMX(c) {
+		return internal.Render(sview.NotFoundPage(), c)
+	}
+	numOfVersions := parseTestEventQueryParams(c.QueryParam("numberOfVersionsForTestEvent"))
+	data, err := h.Q.GetMostRecentStats(c.Request().Context(), database.GetMostRecentStatsParams{
+		Limit:   int64(numOfVersions),
+		Limit_2: int64(numOfVersions),
+		Limit_3: int64(numOfVersions),
+		Limit_4: int64(numOfVersions),
+		Limit_5: int64(numOfVersions),
+		Limit_6: int64(numOfVersions),
+	})
 	if err != nil {
-		limit = 3
+		return err
+	}
+
+	err = SetPushUrlInHeader(c, strconv.Itoa(numOfVersions))
+	if err != nil {
+		return err
+	}
+
+	return internal.Render(stats.RecentStatsList(TransformToMultiField(&data)), c)
+}
+
+func SetPushUrlInHeader(c echo.Context, val string) error {
+	url, err := url.Parse(c.Request().Header.Get("HX-Current-Url"))
+	if err != nil {
+		return err
+	}
+	qp := url.Query()
+	keyToReplace := c.Request().Header.Get("HX-Trigger-Name")
+	qp.Del(keyToReplace)
+	qp.Add(keyToReplace, val)
+	c.Response().Header().Set("HX-Push-Url", url.Path+"?"+qp.Encode())
+	return nil
+}
+
+func testEvent(h StatsHandler, c echo.Context) error {
+	if !internal.FromHTMX(c) {
+		return internal.Render(sview.NotFoundPage(), c)
 	}
 	version := c.QueryParam("version")
+	data, err := h.Q.GetStatsByVersion(c.Request().Context(), database.GetStatsByVersionParams{
+		Version:   version,
+		Version_2: version,
+		Version_3: version,
+		Version_4: version,
+		Version_5: version,
+		Version_6: version,
+	})
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
+
+	err = SetPushUrlInHeader(c, version)
+	if err != nil {
+		return err
+	}
+
+	return internal.Render(stats.FilteredStats(TransformToStatsField(&data)), c)
+}
+
+func catastrophe(h StatsHandler, c echo.Context) error {
+	if !internal.FromHTMX(c) {
+		return internal.Render(sview.NotFoundPage(), c)
+	}
+
+	count := parseCatastropheQueryParams(c.QueryParam("numberOfVersionsForCatastrophe"))
+
+	data, err := h.Q.GetCatastropheKills(c.Request().Context(), int64(count))
+	if err != nil {
+		return err
+	}
+
+	err = SetPushUrlInHeader(c, strconv.Itoa(count))
+	if err != nil {
+		return err
+	}
+
+	return internal.Render(stats.CatastropheStatsList(TransformToCatastropheField(&data)), c)
+}
+
+func normalStatsPageReq(h StatsHandler, c echo.Context) error {
+	limit := parseTestEventQueryParams(c.QueryParam("numberOfVersionsForTestEvent"))
+	version := c.QueryParam("version")
 	singleStatsRes := database.GetStatsByVersionRow{}
+	var err error
 	if version != "" {
 		singleStatsRes, err = h.Q.GetStatsByVersion(c.Request().Context(), database.GetStatsByVersionParams{
 			Version:   version,
@@ -53,7 +151,7 @@ func (h StatsHandler) StatsPage(c echo.Context) error {
 		return err
 	}
 
-	n := 3
+	n := parseCatastropheQueryParams(c.QueryParam("numberOfVersionsForCatastrophe"))
 	catData, err := h.Q.GetCatastropheKills(c.Request().Context(), int64(n))
 	if err != nil {
 		return err
@@ -70,62 +168,4 @@ func (h StatsHandler) StatsPage(c echo.Context) error {
 		return internal.Render(stats.StatsContent(&statsProps), c)
 	}
 	return internal.Render(stats.StatsPage(&statsProps), c)
-}
-
-func (h StatsHandler) LatestVersions(c echo.Context) error {
-	if !internal.FromHTMX(c) {
-		return internal.Render(sview.NotFoundPage(), c)
-	}
-	numOfVersions, err := strconv.Atoi(c.QueryParam("numberOfVersions"))
-	if err != nil || numOfVersions < 3 || numOfVersions > 10 {
-		numOfVersions = 3
-	}
-	data, err := h.Q.GetMostRecentStats(c.Request().Context(), database.GetMostRecentStatsParams{
-		Limit:   int64(numOfVersions),
-		Limit_2: int64(numOfVersions),
-		Limit_3: int64(numOfVersions),
-		Limit_4: int64(numOfVersions),
-		Limit_5: int64(numOfVersions),
-		Limit_6: int64(numOfVersions),
-	})
-	if err != nil {
-		return err
-	}
-	return internal.Render(stats.RecentStatsList(TransformToMultiField(&data)), c)
-}
-
-func (h StatsHandler) FilteredStats(c echo.Context) error {
-	if !internal.FromHTMX(c) {
-		return internal.Render(sview.NotFoundPage(), c)
-	}
-	version := c.QueryParam("version")
-	data, err := h.Q.GetStatsByVersion(c.Request().Context(), database.GetStatsByVersionParams{
-		Version:   version,
-		Version_2: version,
-		Version_3: version,
-		Version_4: version,
-		Version_5: version,
-		Version_6: version,
-	})
-	if err != nil && err != sql.ErrNoRows {
-		return err
-	}
-	return internal.Render(stats.FilteredStats(TransformToStatsField(&data)), c)
-}
-
-func (h StatsHandler) CatastropheDeaths(c echo.Context) error {
-	if !internal.FromHTMX(c) {
-		return internal.Render(sview.NotFoundPage(), c)
-	}
-	count, err := strconv.Atoi(c.QueryParam("count"))
-	if err != nil || count < 1 || count > 10 {
-		count = 3
-	}
-
-	data, err := h.Q.GetCatastropheKills(c.Request().Context(), int64(count))
-	if err != nil {
-		return err
-	}
-
-	return internal.Render(stats.CatastropheStatsList(TransformToCatastropheField(&data)), c)
 }
