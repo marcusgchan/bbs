@@ -19,6 +19,8 @@ jobs:
               run: |
                   go mod download
                   go mod verify
+                  go install github.com/a-h/templ/cmd/templ@latest
+                  templ generate
             - name: Build
               run: go build -v ./...
             - name: Test with the Go CLI
