@@ -3,6 +3,7 @@ package auth
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
@@ -29,6 +30,21 @@ func Authenticated(next echo.HandlerFunc) echo.HandlerFunc {
 			return internal.Render(auth.LoginPage(), c)
 		}
 
+		return next(c)
+	}
+}
+
+func ApiAuth(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		h := c.Request().Header.Get("Authorization")
+		ah := strings.Split(h, " ")
+		if len(ah) != 2 {
+			return fmt.Errorf("invalid authorization header format")
+		}
+		key := ah[1]
+		if key != os.Getenv("API_KEY") {
+			return fmt.Errorf("invalid api key")
+		}
 		return next(c)
 	}
 }

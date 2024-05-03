@@ -67,7 +67,7 @@ func main() {
 	}, auth.Authenticated)
 
 	api := app.Group("/api")
-	// Remember to auth!!!!!!!!!!!!!!!!!!!!!!!!!
+	api.Use(auth.ApiAuth)
 	testEvtApiGroup := api.Group("/test-events")
 	testEvtApiGroup.POST("", testEventsHandler.CreateTestEvent)
 	testEvtApiGroup.POST("/results", testEventsHandler.CreatePlayerTestResult)
