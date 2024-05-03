@@ -2,7 +2,8 @@ name: Go
 on:
     pull_request:
     push:
-        - "main"
+        branches:
+            - "main"
 
 jobs:
     build:
