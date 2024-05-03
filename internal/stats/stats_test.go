@@ -58,7 +58,7 @@ func TestMostRecentStatsWithNoContent(t *testing.T) {
 
 	t.Run("it should return empty array - limit 5", func(t *testing.T) {
 		limit := int64(5)
-		data, err := q.GetMostRecentStats(mc, sqlc.GetMostRecentStatsParams{
+		data, err := q.GetTestEventsStats(mc, sqlc.GetTestEventsStatsParams{
 			Limit:   limit,
 			Limit_2: limit,
 			Limit_3: limit,
@@ -118,7 +118,7 @@ func TestMostRecentStatsWithTestEventButNoTestResult(t *testing.T) {
 
 	t.Run("it should return empty array", func(t *testing.T) {
 		limit := int64(1)
-		data, err := q.GetMostRecentStats(mc, sqlc.GetMostRecentStatsParams{
+		data, err := q.GetTestEventsStats(mc, sqlc.GetTestEventsStatsParams{
 			Limit:   limit,
 			Limit_2: limit,
 			Limit_3: limit,
@@ -176,7 +176,7 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 
 	t.Run("it should return test evt with avg wave of 10, max wave of 10, count 1", func(t *testing.T) {
 		limit := int64(1)
-		data, err := q.GetMostRecentStats(mc, sqlc.GetMostRecentStatsParams{
+		data, err := q.GetTestEventsStats(mc, sqlc.GetTestEventsStatsParams{
 			Limit:   limit,
 			Limit_2: limit,
 			Limit_3: limit,
@@ -213,7 +213,7 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 
 	t.Run("it should return 2 test evt with #1 with avg wave of 20 max wave 20 count 1 #2 with avg wave of 20 max wave of 20 count 1", func(t *testing.T) {
 		limit := int64(2)
-		data, err := q.GetMostRecentStats(mc, sqlc.GetMostRecentStatsParams{
+		data, err := q.GetTestEventsStats(mc, sqlc.GetTestEventsStatsParams{
 			Limit:   limit,
 			Limit_2: limit,
 			Limit_3: limit,
@@ -260,7 +260,7 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 
 	t.Run("it should return 2 evt: #1 avg wave 15 max wave 20 count 2 #2 avg wave 10 max wave 10 num of events 1", func(t *testing.T) {
 		limit := int64(2)
-		data, err := q.GetMostRecentStats(mc, sqlc.GetMostRecentStatsParams{
+		data, err := q.GetTestEventsStats(mc, sqlc.GetTestEventsStatsParams{
 			Limit:   limit,
 			Limit_2: limit,
 			Limit_3: limit,
