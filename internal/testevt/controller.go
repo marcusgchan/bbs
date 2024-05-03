@@ -3,6 +3,7 @@ package testevt
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"strconv"
 	"time"
@@ -99,6 +100,7 @@ type CreateTestEvtReq struct {
 	EnvironmentName string   `json:"environmentName"`
 	TemplateID      string   `json:"templateId"`
 	Difficulty      string   `json:"difficulty"`
+	Version         string   `json:"version"`
 	Date            int64    `json:"date"`
 }
 
@@ -114,11 +116,16 @@ func (h TestEventHandler) CreateTestEvent(c echo.Context) error {
 	}
 	defer tx.Rollback()
 	qtx := h.Q.WithTx(tx)
+	err = qtx.CreateVersion(c.Request().Context(), data.Version)
+	if err != nil {
+		return err
+	}
 	err = qtx.CreateTestEvt(c.Request().Context(), database.CreateTestEvtParams{
 		ID:          data.ID,
 		Templateid:  data.TemplateID,
 		Environment: data.EnvironmentName,
 		Startedat:   time.Unix(data.Date, 0),
+		Version:     data.Version,
 		Difficulty:  data.Difficulty,
 	})
 	if err != nil {
@@ -161,6 +168,7 @@ func (h TestEventHandler) CreatePlayerTestResult(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	fmt.Printf("data %v", data)
 	defer tx.Rollback()
 	// Create general test result
 	createdTestResId, err := qtx.CreateTestResult(c.Request().Context(), database.CreateTestResultParams{
@@ -170,11 +178,14 @@ func (h TestEventHandler) CreatePlayerTestResult(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	err = qtx.UpdateTestEvtWithTestRes(c.Request().Context(), database.UpdateTestEvtWithTestResParams{
+	_, err = qtx.UpdateTestEvtWithTestRes(c.Request().Context(), database.UpdateTestEvtWithTestResParams{
 		Testresultid: sql.NullInt64{Int64: createdTestResId, Valid: true},
 		ID:           data.TestEvtID,
 	})
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return fmt.Errorf("could not find test event with id of %v", data.TestEvtID)
+		}
 		return err
 	}
 	for _, p := range data.Players {

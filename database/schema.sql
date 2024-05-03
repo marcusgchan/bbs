@@ -21,6 +21,11 @@ CREATE TABLE test_results (
     endedAt DATETIME NOT NULL
 );
 
+CREATE TABLE versions (
+    value varchar(10) PRIMARY KEY,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE test_events (
     id varchar(255) PRIMARY KEY,
     environment varchar(255) NOT NULL,
@@ -28,8 +33,10 @@ CREATE TABLE test_events (
     templateId varchar(255) NOT NULL,
     testResultId INTEGER,
     startedAt DATETIME NOT NULL,
+    version varchar(10) NOT NULL,
     FOREIGN KEY (templateId) REFERENCES templates (id),
-    FOREIGN KEY (testResultId) REFERENCES test_results (id)
+    FOREIGN KEY (testResultId) REFERENCES test_results (id),
+    FOREIGN KEY (version) REFERENCES versions (value)
 );
 
 CREATE TABLE player_test_events (

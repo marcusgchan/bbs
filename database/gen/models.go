@@ -55,6 +55,7 @@ type TestEvent struct {
 	Templateid   string
 	Testresultid sql.NullInt64
 	Startedat    time.Time
+	Version      string
 }
 
 type TestResult struct {
@@ -66,4 +67,9 @@ type TestResult struct {
 type User struct {
 	Username string
 	Password string
+}
+
+type Version struct {
+	Value     string
+	Createdat sql.NullTime
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -13,6 +14,7 @@ import (
 	"github.com/marcusgchan/bbs/internal"
 	"github.com/marcusgchan/bbs/internal/auth"
 	"github.com/marcusgchan/bbs/internal/player"
+	"github.com/marcusgchan/bbs/internal/stats"
 	"github.com/marcusgchan/bbs/internal/sview"
 	"github.com/marcusgchan/bbs/internal/template"
 	"github.com/marcusgchan/bbs/internal/testevt"
@@ -24,6 +26,13 @@ func main() {
 	if err != nil {
 		log.Printf("Error loading .env file")
 	}
+
+	if len(os.Args) > 1 && os.Args[1] == "seed" {
+		fmt.Print("Seeding...")
+		database.Seed()
+		return
+	}
+
 	app := echo.New()
 	db := database.Connect()
 	q := slqc.New(db)
@@ -47,6 +56,11 @@ func main() {
 	playersHandler := player.PlayerHandler{Q: q, DB: db}
 	playersGroup.GET("", playersHandler.PlayerListPage)
 	playersGroup.GET("/:playerId", playersHandler.PlayerInfoPage)
+
+	statsGroup := app.Group("/stats")
+	statsGroup.Use(auth.Authenticated)
+	statsHandler := stats.StatsHandler{Q: q, DB: db}
+	statsGroup.GET("", statsHandler.StatsPage)
 
 	app.GET("/*", func(c echo.Context) error {
 		return internal.Render(sview.NotFoundPage(), c)

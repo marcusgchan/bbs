@@ -47,7 +47,7 @@ func (q *Queries) CreatePlayerTestResult(ctx context.Context, arg CreatePlayerTe
 }
 
 const createTestEvt = `-- name: CreateTestEvt :exec
-INSERT INTO test_events (id, environment, templateId, difficulty, startedAt) VALUES (?, ?, ?, ?, ?)
+INSERT INTO test_events (id, environment, templateId, difficulty, version, startedAt) VALUES (?, ?, ?, ?, ?, ?)
 `
 
 type CreateTestEvtParams struct {
@@ -55,6 +55,7 @@ type CreateTestEvtParams struct {
 	Environment string
 	Templateid  string
 	Difficulty  string
+	Version     string
 	Startedat   time.Time
 }
 
@@ -64,6 +65,7 @@ func (q *Queries) CreateTestEvt(ctx context.Context, arg CreateTestEvtParams) er
 		arg.Environment,
 		arg.Templateid,
 		arg.Difficulty,
+		arg.Version,
 		arg.Startedat,
 	)
 	return err
@@ -83,6 +85,15 @@ func (q *Queries) CreateTestResult(ctx context.Context, arg CreateTestResultPara
 	var id int64
 	err := row.Scan(&id)
 	return id, err
+}
+
+const createVersion = `-- name: CreateVersion :exec
+INSERT OR IGNORE INTO versions (value) VALUES (?)
+`
+
+func (q *Queries) CreateVersion(ctx context.Context, value string) error {
+	_, err := q.db.ExecContext(ctx, createVersion, value)
+	return err
 }
 
 const getTestEvtPlayerResults = `-- name: GetTestEvtPlayerResults :many
@@ -130,7 +141,7 @@ func (q *Queries) GetTestEvtPlayerResults(ctx context.Context, testresultid int6
 }
 
 const getTestEvtResults = `-- name: GetTestEvtResults :one
-SELECT test_events.id, test_events.environment, test_events.difficulty, test_events.templateid, test_events.testresultid, test_events.startedat, test_results.id, test_results.moneyearned, test_results.endedat, templates.id, templates.playerid, templates.data, templates.name, templates.createdat, templates.updatedat
+SELECT test_events.id, test_events.environment, test_events.difficulty, test_events.templateid, test_events.testresultid, test_events.startedat, test_events.version, test_results.id, test_results.moneyearned, test_results.endedat, templates.id, templates.playerid, templates.data, templates.name, templates.createdat, templates.updatedat
 FROM test_events
 JOIN test_results ON test_events.testResultId = test_results.id
 JOIN templates ON test_events.templateId = templates.id
@@ -153,6 +164,7 @@ func (q *Queries) GetTestEvtResults(ctx context.Context, id string) (GetTestEvtR
 		&i.TestEvent.Templateid,
 		&i.TestEvent.Testresultid,
 		&i.TestEvent.Startedat,
+		&i.TestEvent.Version,
 		&i.TestResult.ID,
 		&i.TestResult.Moneyearned,
 		&i.TestResult.Endedat,
@@ -167,7 +179,7 @@ func (q *Queries) GetTestEvtResults(ctx context.Context, id string) (GetTestEvtR
 }
 
 const getTestEvts = `-- name: GetTestEvts :many
-SELECT test_events.id, test_events.environment, test_events.difficulty, test_events.templateid, test_events.testresultid, test_events.startedat, players.name as mainPlayer 
+SELECT test_events.id, test_events.environment, test_events.difficulty, test_events.templateid, test_events.testresultid, test_events.startedat, test_events.version, players.name as mainPlayer 
 FROM test_events
 JOIN templates ON templates.id = test_events.templateId
 JOIN players ON players.id = templates.playerId
@@ -187,6 +199,7 @@ type GetTestEvtsRow struct {
 	Templateid   string
 	Testresultid sql.NullInt64
 	Startedat    time.Time
+	Version      string
 	Mainplayer   string
 }
 
@@ -206,6 +219,7 @@ func (q *Queries) GetTestEvts(ctx context.Context, arg GetTestEvtsParams) ([]Get
 			&i.Templateid,
 			&i.Testresultid,
 			&i.Startedat,
+			&i.Version,
 			&i.Mainplayer,
 		); err != nil {
 			return nil, err
@@ -232,8 +246,8 @@ func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
 	return i, err
 }
 
-const updateTestEvtWithTestRes = `-- name: UpdateTestEvtWithTestRes :exec
-UPDATE test_events SET testResultId = ? WHERE id = ?
+const updateTestEvtWithTestRes = `-- name: UpdateTestEvtWithTestRes :one
+UPDATE test_events SET testResultId = ? WHERE id = ? RETURNING id
 `
 
 type UpdateTestEvtWithTestResParams struct {
@@ -241,7 +255,9 @@ type UpdateTestEvtWithTestResParams struct {
 	ID           string
 }
 
-func (q *Queries) UpdateTestEvtWithTestRes(ctx context.Context, arg UpdateTestEvtWithTestResParams) error {
-	_, err := q.db.ExecContext(ctx, updateTestEvtWithTestRes, arg.Testresultid, arg.ID)
-	return err
+func (q *Queries) UpdateTestEvtWithTestRes(ctx context.Context, arg UpdateTestEvtWithTestResParams) (string, error) {
+	row := q.db.QueryRowContext(ctx, updateTestEvtWithTestRes, arg.Testresultid, arg.ID)
+	var id string
+	err := row.Scan(&id)
+	return id, err
 }
