@@ -1,6 +1,7 @@
 package stats
 
 import "github.com/marcusgchan/bbs/internal/sview"
+import "strconv"
 
 type Stats struct {
 	Version         string
@@ -23,6 +24,13 @@ type StatsPageProps struct {
 	Multi             *[]Stats
 	Versions          *[]Version
 	CatastropheDeaths *[]CatastropheDeaths
+	*InputDefaults
+}
+
+type InputDefaults struct {
+	Catastrophe      string
+	RecentTestEvents string
+	TestEvent        string
 }
 
 type Version struct {
@@ -42,10 +50,25 @@ templ StatsContent(props *StatsPageProps) {
 		<section class="flex-1 flex gap-2 [grid-area:filtered-stats]">
 			<div>
 				<label>Select Version</label>
-				<select hx-get="/stats" hx-trigger="change" hx-trigger="change" class="p-2" hx-target="[data-filtered-stats]" hx-swap="innerHTML" name="version">
-					<option value="" selected hidden>Select version</option>
+				<select
+					hx-get="/stats"
+					hx-trigger="change"
+					hx-trigger="change"
+					class="p-2"
+					hx-target="[data-filtered-stats]"
+					hx-swap="innerHTML"
+					name="version"
+				>
+					if props.InputDefaults.TestEvent == "" {
+						<option value="" selected hidden>Select version</option>
+					}
 					for _, version := range *props.Versions {
-						<option value={ version.Version }>{ version.Version }</option>
+						<option
+							value={ version.Version }
+							if version.Version == props.InputDefaults.TestEvent {
+								selected
+							}
+						>{ version.Version }</option>
 					}
 				</select>
 			</div>
@@ -57,13 +80,15 @@ templ StatsContent(props *StatsPageProps) {
 		<section class="[grid-area:catastrophe-stats] min-w-0">
 			<div class="flex gap-2">
 				<h2 class="text-lg">Catastrophe Stats</h2>
-				<select class="p-2" hx-get="/stats" hx-trigger="change" hx-target="[data-catastrophe-stats-list]" hx-swap="innerHTML" name="numberOfVersionsForCatastrophe" value="3">
-					<option>3</option>
-					<option>4</option>
-					<option>5</option>
-					<option>6</option>
-					<option>7</option>
-					<option>8</option>
+				<select class="p-2" hx-get="/stats" hx-trigger="change" hx-target="[data-catastrophe-stats-list]" hx-swap="innerHTML" name="numberOfVersionsForCatastrophe" value={ props.InputDefaults.Catastrophe }>
+					for i := 3; i < 9; i++ {
+						<option
+							value={ strconv.Itoa(i) }
+							if strconv.Itoa(i) == props.InputDefaults.Catastrophe {
+								selected
+							}
+						>{ strconv.Itoa(i) }</option>
+					}
 				</select>
 			</div>
 			@CatastropheStatsList(props.CatastropheDeaths)
@@ -71,13 +96,15 @@ templ StatsContent(props *StatsPageProps) {
 		<section class="space-y-2 [grid-area:recent-stats]">
 			<div class="flex gap-2">
 				<h2 class="text-lg">Recent Test Event Statistics</h2>
-				<select class="p-2" hx-target="[data-recent-stats-list]" hx-get="/stats" hx-trigger="change" hx-swap="innerHTML" name="numberOfVersionsForTestEvent" value="3">
-					<option>3</option>
-					<option>4</option>
-					<option>5</option>
-					<option>6</option>
-					<option>7</option>
-					<option>8</option>
+				<select class="p-2" hx-target="[data-recent-stats-list]" hx-get="/stats" hx-trigger="change" hx-swap="innerHTML" name="numberOfVersionsForTestEvent" value={ props.InputDefaults.RecentTestEvents }>
+					for i := 3; i < 9; i++ {
+						<option
+							value={ strconv.Itoa(i) }
+							if strconv.Itoa(i) == props.InputDefaults.RecentTestEvents {
+								selected
+							}
+						>{ strconv.Itoa(i) }</option>
+					}
 				</select>
 			</div>
 			@RecentStatsList(props.Multi)

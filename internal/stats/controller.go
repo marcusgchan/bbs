@@ -157,11 +157,22 @@ func normalStatsPageReq(h StatsHandler, c echo.Context) error {
 		return err
 	}
 
+	defaults := &stats.InputDefaults{
+		Catastrophe:      strconv.Itoa(n),
+		RecentTestEvents: strconv.Itoa(limit),
+		TestEvent:        version,
+	}
+
+	if singleStatsRes != (database.GetStatsByVersionRow{}) {
+		defaults.TestEvent = version
+	}
+
 	statsProps := stats.StatsPageProps{
 		Single:            TransformToSingleField(&singleStatsRes),
 		Multi:             TransformToMultiField(&muliStatsRes),
 		Versions:          TransformToVersionsField(&versions),
 		CatastropheDeaths: TransformToCatastropheField(&catData),
+		InputDefaults:     defaults,
 	}
 
 	if internal.FromHTMX(c) {
