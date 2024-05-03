@@ -12,6 +12,8 @@ jobs:
         steps:
             - uses: actions/checkout@v4
             - uses: pnpm/action-setup@v3
+              with:
+                  version: 8
             - name: Setup Go
               uses: actions/setup-go@v5
               with:
@@ -22,6 +24,7 @@ jobs:
                   go mod verify
                   go install github.com/a-h/templ/cmd/templ@latest
                   templ generate
+                  pnpm run build
             - name: Build
               run: go build -v ./...
             - name: Test with the Go CLI
