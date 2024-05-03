@@ -17,6 +17,7 @@ jobs:
                   run_install: true
             - name: Setup Go
               uses: actions/setup-go@v5
+            - uses: ariga/setup-atlas@v0
               with:
                   go-version: "1.21.x"
             - name: Install dependencies
