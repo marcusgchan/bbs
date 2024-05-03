@@ -68,12 +68,8 @@ func TransformToCatastropheField(data *[]database.GetCatastropheKillsRow) *[]sta
 	var cur *stats.CatastropheDeaths
 
 	for _, row := range *data {
-		fmt.Printf("ver: %v\n", row.Version)
-		fmt.Printf("prev ver |%v|\n", prevVer)
 		if prevVer != row.Version {
-			fmt.Printf("ver not the same. cur |%v|\n", cur)
 			if cur != nil {
-				fmt.Printf("appending prev content to array %v\n", *cur)
 				res = append(res, *cur)
 			}
 
@@ -88,7 +84,6 @@ func TransformToCatastropheField(data *[]database.GetCatastropheKillsRow) *[]sta
 			cur.Catastrophies = append(cur.Catastrophies, row.Catastrophe)
 			cur.Deaths = append(cur.Deaths, int(row.Deaths))
 			cur.TotalDeaths += int(row.Deaths)
-			fmt.Printf("data in loop: %v\n", res)
 			continue
 		}
 
@@ -98,10 +93,8 @@ func TransformToCatastropheField(data *[]database.GetCatastropheKillsRow) *[]sta
 	}
 
 	if cur != nil {
-		fmt.Printf("appending prev content to array %v\n", *cur)
 		res = append(res, *cur)
 	}
-	fmt.Printf("data out loop: %v\n", res)
 
 	return &res
 }
