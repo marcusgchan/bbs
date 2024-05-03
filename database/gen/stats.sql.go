@@ -52,7 +52,86 @@ func (q *Queries) GetCatastropheKills(ctx context.Context, limit int64) ([]GetCa
 	return items, nil
 }
 
-const getMostRecentStats = `-- name: GetMostRecentStats :many
+const getTestEventStatsByVersion = `-- name: GetTestEventStatsByVersion :one
+SELECT AvgWave.version, AvgWave.avgWave, AvgMoney.avgMoneyEarned, MaxWave.maxWave, Count.numOfTestEvents, StartDate.startDate, EndDate.endDate
+FROM (
+    SELECT test_events.version, CAST(AVG(player_test_results.wavesSurvived) as REAL) as avgWave
+    FROM test_events
+    INNER JOIN player_test_results ON player_test_results.testResultId = test_events.testResultId
+    WHERE test_events.version = ?
+) as AvgWave, (
+    SELECT test_events.version, CAST(AVG(test_results.moneyEarned) as REAL) as avgMoneyEarned
+    FROM test_events
+    INNER JOIN test_results ON test_events.testResultId = test_results.id
+    WHERE test_events.version = ?
+) as AvgMoney, (
+    SELECT test_events.version, CAST(MAX(player_test_results.wavesSurvived) AS INTEGER) as maxWave
+    FROM test_events
+    INNER JOIN player_test_results ON player_test_results.testResultId = test_events.testResultId
+    WHERE test_events.version = ?
+) as MaxWave, (
+    SELECT test_events.version, COUNT(test_events.id) as numOfTestEvents
+    FROM test_events
+    WHERE test_events.testResultId IS NOT NULL AND test_events.version = ?
+) as Count, (
+    SELECT test_events.version, CAST(MIN(test_events.startedAt) AS TEXT) as startDate
+    FROM test_events
+    WHERE test_events.testResultId IS NOT NULL AND test_events.version = ?
+) as StartDate, (
+    SELECT test_events.version, CAST(MAX(test_results.endedAt) AS TEXT) as endDate
+    FROM test_events
+    INNER JOIN test_results ON test_events.testResultId = test_results.id
+    WHERE test_events.version = ?
+) as EndDate
+WHERE AvgWave.version = MaxWave.version 
+AND MaxWave.version = Count.version
+AND AvgMoney.version = Count.version
+AND Count.version = StartDate.version
+AND StartDate.version = EndDate.version
+`
+
+type GetTestEventStatsByVersionParams struct {
+	Version   string
+	Version_2 string
+	Version_3 string
+	Version_4 string
+	Version_5 string
+	Version_6 string
+}
+
+type GetTestEventStatsByVersionRow struct {
+	Version         string
+	Avgwave         float64
+	Avgmoneyearned  float64
+	Maxwave         int64
+	Numoftestevents int64
+	Startdate       string
+	Enddate         string
+}
+
+func (q *Queries) GetTestEventStatsByVersion(ctx context.Context, arg GetTestEventStatsByVersionParams) (GetTestEventStatsByVersionRow, error) {
+	row := q.db.QueryRowContext(ctx, getTestEventStatsByVersion,
+		arg.Version,
+		arg.Version_2,
+		arg.Version_3,
+		arg.Version_4,
+		arg.Version_5,
+		arg.Version_6,
+	)
+	var i GetTestEventStatsByVersionRow
+	err := row.Scan(
+		&i.Version,
+		&i.Avgwave,
+		&i.Avgmoneyearned,
+		&i.Maxwave,
+		&i.Numoftestevents,
+		&i.Startdate,
+		&i.Enddate,
+	)
+	return i, err
+}
+
+const getTestEventsStats = `-- name: GetTestEventsStats :many
 SELECT AvgWave.version, AvgWave.avgWave, AvgMoney.avgMoneyEarned, MaxWave.maxWave, Count.numOfTestEvents, StartDate.startDate, EndDate.endDate
     FROM (
     SELECT test_events.version, CAST(AVG(player_test_results.wavesSurvived) as REAL) as avgWave
@@ -127,7 +206,7 @@ AND StartDate.version = EndDate.version
 ORDER BY AvgWave.version DESC
 `
 
-type GetMostRecentStatsParams struct {
+type GetTestEventsStatsParams struct {
 	Limit   int64
 	Limit_2 int64
 	Limit_3 int64
@@ -136,7 +215,7 @@ type GetMostRecentStatsParams struct {
 	Limit_6 int64
 }
 
-type GetMostRecentStatsRow struct {
+type GetTestEventsStatsRow struct {
 	Version         string
 	Avgwave         float64
 	Avgmoneyearned  float64
@@ -146,8 +225,8 @@ type GetMostRecentStatsRow struct {
 	Enddate         string
 }
 
-func (q *Queries) GetMostRecentStats(ctx context.Context, arg GetMostRecentStatsParams) ([]GetMostRecentStatsRow, error) {
-	rows, err := q.db.QueryContext(ctx, getMostRecentStats,
+func (q *Queries) GetTestEventsStats(ctx context.Context, arg GetTestEventsStatsParams) ([]GetTestEventsStatsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getTestEventsStats,
 		arg.Limit,
 		arg.Limit_2,
 		arg.Limit_3,
@@ -159,9 +238,9 @@ func (q *Queries) GetMostRecentStats(ctx context.Context, arg GetMostRecentStats
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetMostRecentStatsRow
+	var items []GetTestEventsStatsRow
 	for rows.Next() {
-		var i GetMostRecentStatsRow
+		var i GetTestEventsStatsRow
 		if err := rows.Scan(
 			&i.Version,
 			&i.Avgwave,
@@ -182,85 +261,6 @@ func (q *Queries) GetMostRecentStats(ctx context.Context, arg GetMostRecentStats
 		return nil, err
 	}
 	return items, nil
-}
-
-const getStatsByVersion = `-- name: GetStatsByVersion :one
-SELECT AvgWave.version, AvgWave.avgWave, AvgMoney.avgMoneyEarned, MaxWave.maxWave, Count.numOfTestEvents, StartDate.startDate, EndDate.endDate
-FROM (
-    SELECT test_events.version, CAST(AVG(player_test_results.wavesSurvived) as REAL) as avgWave
-    FROM test_events
-    INNER JOIN player_test_results ON player_test_results.testResultId = test_events.testResultId
-    WHERE test_events.version = ?
-) as AvgWave, (
-    SELECT test_events.version, CAST(AVG(test_results.moneyEarned) as REAL) as avgMoneyEarned
-    FROM test_events
-    INNER JOIN test_results ON test_events.testResultId = test_results.id
-    WHERE test_events.version = ?
-) as AvgMoney, (
-    SELECT test_events.version, CAST(MAX(player_test_results.wavesSurvived) AS INTEGER) as maxWave
-    FROM test_events
-    INNER JOIN player_test_results ON player_test_results.testResultId = test_events.testResultId
-    WHERE test_events.version = ?
-) as MaxWave, (
-    SELECT test_events.version, COUNT(test_events.id) as numOfTestEvents
-    FROM test_events
-    WHERE test_events.testResultId IS NOT NULL AND test_events.version = ?
-) as Count, (
-    SELECT test_events.version, CAST(MIN(test_events.startedAt) AS TEXT) as startDate
-    FROM test_events
-    WHERE test_events.testResultId IS NOT NULL AND test_events.version = ?
-) as StartDate, (
-    SELECT test_events.version, CAST(MAX(test_results.endedAt) AS TEXT) as endDate
-    FROM test_events
-    INNER JOIN test_results ON test_events.testResultId = test_results.id
-    WHERE test_events.version = ?
-) as EndDate
-WHERE AvgWave.version = MaxWave.version 
-AND MaxWave.version = Count.version
-AND AvgMoney.version = Count.version
-AND Count.version = StartDate.version
-AND StartDate.version = EndDate.version
-`
-
-type GetStatsByVersionParams struct {
-	Version   string
-	Version_2 string
-	Version_3 string
-	Version_4 string
-	Version_5 string
-	Version_6 string
-}
-
-type GetStatsByVersionRow struct {
-	Version         string
-	Avgwave         float64
-	Avgmoneyearned  float64
-	Maxwave         int64
-	Numoftestevents int64
-	Startdate       string
-	Enddate         string
-}
-
-func (q *Queries) GetStatsByVersion(ctx context.Context, arg GetStatsByVersionParams) (GetStatsByVersionRow, error) {
-	row := q.db.QueryRowContext(ctx, getStatsByVersion,
-		arg.Version,
-		arg.Version_2,
-		arg.Version_3,
-		arg.Version_4,
-		arg.Version_5,
-		arg.Version_6,
-	)
-	var i GetStatsByVersionRow
-	err := row.Scan(
-		&i.Version,
-		&i.Avgwave,
-		&i.Avgmoneyearned,
-		&i.Maxwave,
-		&i.Numoftestevents,
-		&i.Startdate,
-		&i.Enddate,
-	)
-	return i, err
 }
 
 const getVersions = `-- name: GetVersions :many

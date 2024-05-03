@@ -19,8 +19,8 @@ func TransformToVersionsField(data *[]database.Version) *[]stats.Version {
 	return &versions
 }
 
-func TransformToSingleField(data *database.GetStatsByVersionRow) *stats.Stats {
-	if *data == (database.GetStatsByVersionRow{}) {
+func TransformToSingleField(data *database.GetTestEventStatsByVersionRow) *stats.Stats {
+	if *data == (database.GetTestEventStatsByVersionRow{}) {
 		return nil
 	}
 	return &stats.Stats{
@@ -33,7 +33,7 @@ func TransformToSingleField(data *database.GetStatsByVersionRow) *stats.Stats {
 	}
 }
 
-func TransformToMultiField(data *[]database.GetMostRecentStatsRow) *[]stats.Stats {
+func TransformToMultiField(data *[]database.GetTestEventsStatsRow) *[]stats.Stats {
 	s := make([]stats.Stats, len(*data))
 	for i, v := range *data {
 		s[i] = stats.Stats{
@@ -48,8 +48,8 @@ func TransformToMultiField(data *[]database.GetMostRecentStatsRow) *[]stats.Stat
 	return &s
 }
 
-func TransformToStatsField(data *database.GetStatsByVersionRow) *stats.Stats {
-	if *data == (database.GetStatsByVersionRow{}) {
+func TransformToStatsField(data *database.GetTestEventStatsByVersionRow) *stats.Stats {
+	if *data == (database.GetTestEventStatsByVersionRow{}) {
 		return nil
 	}
 	return &stats.Stats{

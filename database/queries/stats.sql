@@ -1,4 +1,4 @@
--- name: GetMostRecentStats :many
+-- name: GetTestEventsStats :many
 SELECT AvgWave.version, AvgWave.avgWave, AvgMoney.avgMoneyEarned, MaxWave.maxWave, Count.numOfTestEvents, StartDate.startDate, EndDate.endDate
     FROM (
     SELECT test_events.version, CAST(AVG(player_test_results.wavesSurvived) as REAL) as avgWave
@@ -72,7 +72,7 @@ AND Count.version = StartDate.version
 AND StartDate.version = EndDate.version
 ORDER BY AvgWave.version DESC;
 
--- name: GetStatsByVersion :one
+-- name: GetTestEventStatsByVersion :one
 SELECT AvgWave.version, AvgWave.avgWave, AvgMoney.avgMoneyEarned, MaxWave.maxWave, Count.numOfTestEvents, StartDate.startDate, EndDate.endDate
 FROM (
     SELECT test_events.version, CAST(AVG(player_test_results.wavesSurvived) as REAL) as avgWave

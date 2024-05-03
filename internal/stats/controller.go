@@ -38,7 +38,7 @@ func recentTestEvents(h StatsHandler, c echo.Context) error {
 		return internal.Render(sview.NotFoundPage(), c)
 	}
 	numOfVersions := parseTestEventQueryParams(c.QueryParam("numberOfVersionsForTestEvent"))
-	data, err := h.Q.GetMostRecentStats(c.Request().Context(), database.GetMostRecentStatsParams{
+	data, err := h.Q.GetTestEventsStats(c.Request().Context(), database.GetTestEventsStatsParams{
 		Limit:   int64(numOfVersions),
 		Limit_2: int64(numOfVersions),
 		Limit_3: int64(numOfVersions),
@@ -76,7 +76,7 @@ func testEvent(h StatsHandler, c echo.Context) error {
 		return internal.Render(sview.NotFoundPage(), c)
 	}
 	version := c.QueryParam("version")
-	data, err := h.Q.GetStatsByVersion(c.Request().Context(), database.GetStatsByVersionParams{
+	data, err := h.Q.GetTestEventStatsByVersion(c.Request().Context(), database.GetTestEventStatsByVersionParams{
 		Version:   version,
 		Version_2: version,
 		Version_3: version,
@@ -119,10 +119,10 @@ func catastrophe(h StatsHandler, c echo.Context) error {
 func normalStatsPageReq(h StatsHandler, c echo.Context) error {
 	limit := parseTestEventQueryParams(c.QueryParam("numberOfVersionsForTestEvent"))
 	version := c.QueryParam("version")
-	singleStatsRes := database.GetStatsByVersionRow{}
+	singleStatsRes := database.GetTestEventStatsByVersionRow{}
 	var err error
 	if version != "" {
-		singleStatsRes, err = h.Q.GetStatsByVersion(c.Request().Context(), database.GetStatsByVersionParams{
+		singleStatsRes, err = h.Q.GetTestEventStatsByVersion(c.Request().Context(), database.GetTestEventStatsByVersionParams{
 			Version:   version,
 			Version_2: version,
 			Version_3: version,
@@ -134,7 +134,7 @@ func normalStatsPageReq(h StatsHandler, c echo.Context) error {
 			return err
 		}
 	}
-	muliStatsRes, err := h.Q.GetMostRecentStats(c.Request().Context(), database.GetMostRecentStatsParams{
+	testEventsStats, err := h.Q.GetTestEventsStats(c.Request().Context(), database.GetTestEventsStatsParams{
 		Limit:   int64(limit),
 		Limit_2: int64(limit),
 		Limit_3: int64(limit),
@@ -163,13 +163,13 @@ func normalStatsPageReq(h StatsHandler, c echo.Context) error {
 		TestEvent:        version,
 	}
 
-	if singleStatsRes != (database.GetStatsByVersionRow{}) {
+	if singleStatsRes != (database.GetTestEventStatsByVersionRow{}) {
 		defaults.TestEvent = version
 	}
 
 	statsProps := stats.StatsPageProps{
 		Single:            TransformToSingleField(&singleStatsRes),
-		Multi:             TransformToMultiField(&muliStatsRes),
+		Multi:             TransformToMultiField(&testEventsStats),
 		Versions:          TransformToVersionsField(&versions),
 		CatastropheDeaths: TransformToCatastropheField(&catData),
 		InputDefaults:     defaults,
