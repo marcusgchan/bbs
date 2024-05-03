@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	database "github.com/marcusgchan/bbs/database/gen"
@@ -88,9 +89,10 @@ func (h PlayerHandler) CreatePlayer(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	err = h.Q.CreatePlayer(c.Request().Context(), database.CreatePlayerParams{
-		ID:   data.ID,
-		Name: data.Name,
+	err = h.Q.UpsertPlayer(c.Request().Context(), database.UpsertPlayerParams{
+		ID:        data.ID,
+		Name:      data.Name,
+		Updatedat: time.Now(),
 	})
 	if err != nil {
 		return err

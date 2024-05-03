@@ -7,21 +7,8 @@ package database
 
 import (
 	"context"
+	"time"
 )
-
-const createPlayer = `-- name: CreatePlayer :exec
-INSERT OR REPLACE INTO players (id, name) VALUES (?, ?)
-`
-
-type CreatePlayerParams struct {
-	ID   string
-	Name string
-}
-
-func (q *Queries) CreatePlayer(ctx context.Context, arg CreatePlayerParams) error {
-	_, err := q.db.ExecContext(ctx, createPlayer, arg.ID, arg.Name)
-	return err
-}
 
 const getPlayers = `-- name: GetPlayers :many
 SELECT id, name, createdat, updatedat FROM players
@@ -60,4 +47,21 @@ func (q *Queries) GetPlayers(ctx context.Context, arg GetPlayersParams) ([]Playe
 		return nil, err
 	}
 	return items, nil
+}
+
+const upsertPlayer = `-- name: UpsertPlayer :exec
+INSERT INTO players (id, name, updatedAt) 
+VALUES (?, ?, ?) ON CONFLICT (id)
+DO UPDATE SET name = excluded.name AND updatedAt = excluded.updatedAt
+`
+
+type UpsertPlayerParams struct {
+	ID        string
+	Name      string
+	Updatedat time.Time
+}
+
+func (q *Queries) UpsertPlayer(ctx context.Context, arg UpsertPlayerParams) error {
+	_, err := q.db.ExecContext(ctx, upsertPlayer, arg.ID, arg.Name, arg.Updatedat)
+	return err
 }

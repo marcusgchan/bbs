@@ -17,8 +17,8 @@ type Component struct {
 type Player struct {
 	ID        string
 	Name      string
-	Createdat sql.NullTime
-	Updatedat sql.NullTime
+	Createdat time.Time
+	Updatedat time.Time
 }
 
 type PlayerComponent struct {
