@@ -18,7 +18,7 @@ jobs:
             - name: Install dependencies
               run: |
                   go mod download
-                  go verify
+                  go mod verify
             - name: Build
               run: go build -v ./...
             - name: Test with the Go CLI
