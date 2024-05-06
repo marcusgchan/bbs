@@ -2,6 +2,7 @@ package auth
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 
@@ -39,12 +40,12 @@ func ApiAuth(next echo.HandlerFunc) echo.HandlerFunc {
 		h := c.Request().Header.Get("Authorization")
 		ah := strings.Split(h, " ")
 		if len(ah) != 2 {
-			return fmt.Errorf("invalid authorization header format")
+			return c.String(http.StatusBadRequest, "invalid authorization header format")
 		}
 		key := ah[1]
-		if key != os.Getenv("API_KEY") {
-			return fmt.Errorf("invalid api key")
+		if key == os.Getenv("API_KEY") {
+			return next(c)
 		}
-		return next(c)
+		return c.NoContent(http.StatusUnauthorized)
 	}
 }
