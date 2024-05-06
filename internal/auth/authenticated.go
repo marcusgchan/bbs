@@ -38,10 +38,12 @@ func Authenticated(next echo.HandlerFunc) echo.HandlerFunc {
 func ApiAuth(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		h := c.Request().Header.Get("Authorization")
+		fmt.Printf("header: %v\n", h)
 		if h == "" {
 			return c.String(http.StatusUnauthorized, "missing authorization header")
 		}
 		ah := strings.Split(h, " ")
+		fmt.Printf("after split: %v\n", ah)
 		if len(ah) != 2 {
 			return c.String(http.StatusBadRequest, "invalid authorization header format")
 		}
