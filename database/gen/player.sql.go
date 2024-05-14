@@ -52,7 +52,7 @@ func (q *Queries) GetPlayers(ctx context.Context, arg GetPlayersParams) ([]Playe
 const upsertPlayer = `-- name: UpsertPlayer :exec
 INSERT INTO players (id, name, updatedAt) 
 VALUES (?, ?, ?) ON CONFLICT (id)
-DO UPDATE SET name = excluded.name AND updatedAt = excluded.updatedAt
+DO UPDATE SET name = excluded.name, updatedAt = excluded.updatedAt
 `
 
 type UpsertPlayerParams struct {
