@@ -112,7 +112,7 @@ type CreateTestEvtReq struct {
 func (h TestEventHandler) CreateTestEvent(c echo.Context) error {
 	data := new(CreateTestEvtReq)
 	err := json.NewDecoder(c.Request().Body).Decode(data)
-	fmt.Printf("test evt %v\n", data)
+	fmt.Printf("test evt %+v\n", data)
 	if err != nil {
 		return err
 	}
@@ -174,7 +174,7 @@ func (h TestEventHandler) CreatePlayerTestResult(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("data %v", data)
+	fmt.Printf("data %+v", data)
 	defer tx.Rollback()
 	// Create general test result
 	createdTestResId, err := qtx.CreateTestResult(c.Request().Context(), database.CreateTestResultParams{
