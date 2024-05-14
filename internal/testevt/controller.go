@@ -111,8 +111,8 @@ type CreateTestEvtReq struct {
 
 func (h TestEventHandler) CreateTestEvent(c echo.Context) error {
 	data := new(CreateTestEvtReq)
-	fmt.Printf("test evt %v\n", data)
 	err := json.NewDecoder(c.Request().Body).Decode(data)
+	fmt.Printf("test evt %v\n", data)
 	if err != nil {
 		return err
 	}
