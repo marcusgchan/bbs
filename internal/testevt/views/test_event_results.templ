@@ -46,10 +46,10 @@ templ TestEvtResContent(evtRes TestEvtResProps, template TestEvtTemplateRes, pla
 		<div>
 			<h2>Template ID: { template.ID }</h2>
 			<h2>Owner: { template.Owner }</h2>
-			<h2>Data: { template.Data }</h2>
+			<div id="base-container" class="w-[600px] aspect-square"></div>
 		</div>
 	</div>
-	<ul>
+	<ul class="space-y-2">
 		for _, player := range playerRes {
 			<li>
 				<h2>Player ID: { player.ID }</h2>
@@ -59,4 +59,65 @@ templ TestEvtResContent(evtRes TestEvtResProps, template TestEvtTemplateRes, pla
 			</li>
 		}
 	</ul>
+	<script type="module">
+        import * as THREE from "three"
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        const container = document.getElementById("base-container");
+        const scene = new THREE.Scene();
+
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize( container.offsetWidth, container.offsetHeight );
+        container.appendChild( renderer.domElement );
+
+        const camera = new THREE.PerspectiveCamera( 75, container.offsetWidth / container.offsetHeight, 0.1, 1000 );
+        const controls = new OrbitControls( camera, renderer.domElement );
+
+        const light = new THREE.AmbientLight( 0xffffff, 1 ); // soft white light
+        scene.add( light );
+        // White directional light at half intensity shining from the top.
+        const directionalLight1 = new THREE.DirectionalLight( 0x00fffc, 1 );
+        directionalLight1.position.set(100, 50, 100)
+        scene.add( directionalLight1 );
+        const directionalLight2 = new THREE.DirectionalLight( 0x00ffcc, 1 );
+        directionalLight1.position.set(-100, 50, -100)
+        scene.add( directionalLight2 );
+
+        const hemisphereLight = new THREE.HemisphereLight(0xff0000, 0x0000ff, 2)
+        scene.add( hemisphereLight )
+
+        let blocks = container.dataset.data;
+        try {
+            blocks = JSON.parse(blocks)
+        } catch(e) {
+            console.error("invalid json format", e);
+            blocks = []
+        }
+            // const geometry = new THREE.BoxGeometry( 2, 2, 2 ); 
+            // const material = new THREE.MeshStandardMaterial({ roughness: 0.2, emissive: 0x000000, color: 0x049ef4 }); 
+            // const cube = new THREE.Mesh( geometry, material ); 
+            // scene.add( cube );
+            // camera.position.z = 3;
+        for (const block of blocks) {
+            const geometry = new THREE.BoxGeometry( 2, 2, 2 ); 
+            geometry.translate(block.x, block.y, block.z)
+            // const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} ); 
+            const material = new THREE.MeshStandardMaterial({ roughness: 0.1, emissive: 0x000000, color: 0x049ef4 }); 
+            const cube = new THREE.Mesh( geometry, material ); 
+            scene.add( cube );
+        }
+
+        camera.position.z = 100;
+
+        function animate() {
+            requestAnimationFrame( animate );
+            controls.update();
+            renderer.render( scene, camera );
+        }
+        animate();
+    </script>
+	@Base(template.Data)
+}
+
+script Base(data string) {
+    document.getElementById("base-container").setAttribute("data-data", data);
 }
