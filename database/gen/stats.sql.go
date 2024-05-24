@@ -138,22 +138,24 @@ SELECT AvgWave.version, AvgWave.avgWave, AvgMoney.avgMoneyEarned, MaxWave.maxWav
     FROM (
         SELECT DISTINCT value as version FROM versions
         ORDER BY value DESC
-        LIMIT ?
+        LIMIT ?1
     ) as S
     JOIN test_events ON test_events.version = S.version
     INNER JOIN test_results ON test_events.testResultId = test_results.id
     JOIN player_test_results ON test_events.testResultId = player_test_results.testresultId
+    WHERE test_events.difficulty = ?2
     GROUP BY test_events.version
 ) as AvgWave, (
     SELECT test_events.version, CAST(MAX(player_test_results.wavesSurvived) AS INTEGER) as maxWave
     FROM (
         SELECT DISTINCT value as version FROM versions
         ORDER BY value DESC
-        LIMIT ?
+        LIMIT ?1
     ) as S
     JOIN test_events ON test_events.version = S.version
     INNER JOIN test_results ON test_events.testResultId = test_results.id
     JOIN player_test_results ON test_events.testResultId = player_test_results.testresultId
+    WHERE test_events.difficulty = ?2
     GROUP BY test_events.version
 ) as MaxWave, (
     SELECT test_events.version, CAST(AVG(test_results.moneyEarned) as REAL) as avgMoneyEarned
@@ -161,10 +163,11 @@ SELECT AvgWave.version, AvgWave.avgWave, AvgMoney.avgMoneyEarned, MaxWave.maxWav
         SELECT DISTINCT value as version 
         FROM versions
         ORDER BY value DESC
-        LIMIT ?
+        LIMIT ?1
     ) as S
     JOIN test_events ON test_events.version = S.version
     INNER JOIN test_results ON test_events.testResultId = test_results.id
+    WHERE test_events.difficulty = ?2
     GROUP BY test_events.version
 ) as AvgMoney, (
     SELECT test_events.version, COUNT(test_events.id) as numOfTestEvents
@@ -172,30 +175,33 @@ SELECT AvgWave.version, AvgWave.avgWave, AvgMoney.avgMoneyEarned, MaxWave.maxWav
         SELECT DISTINCT value as version 
         FROM versions
         ORDER BY value DESC
-        LIMIT ?
+        LIMIT ?1
     ) as S
     JOIN test_events ON test_events.version = S.version
     WHERE test_events.testResultId IS NOT NULL
+    AND test_events.difficulty = ?2
     GROUP BY test_events.version
 ) as Count, (
     SELECT test_events.version, CAST(MIN(test_events.startedAt) AS TEXT) as startDate
     FROM (
         SELECT DISTINCT value as version FROM versions
         ORDER BY value DESC
-        LIMIT ?
+        LIMIT ?1
     ) as S
     JOIN test_events ON test_events.version = S.version
     WHERE test_events.testResultId IS NOT NULL
+    AND test_events.difficulty = ?2
     GROUP BY test_events.version
 ) as StartDate, (
     SELECT test_events.version, CAST(MAX(test_results.endedAt) AS TEXT) as endDate
     FROM (
         SELECT DISTINCT value as version FROM versions
         ORDER BY value DESC
-        LIMIT ?
+        LIMIT ?1
     ) as S
     JOIN test_events ON test_events.version = S.version
     INNER JOIN test_results ON test_events.testResultId = test_results.id
+    WHERE test_events.difficulty = ?2
     GROUP BY test_events.version
 ) as EndDate
 WHERE AvgWave.version = MaxWave.version
@@ -207,12 +213,8 @@ ORDER BY AvgWave.version DESC
 `
 
 type GetTestEventsStatsParams struct {
-	Limit   int64
-	Limit_2 int64
-	Limit_3 int64
-	Limit_4 int64
-	Limit_5 int64
-	Limit_6 int64
+	Limit      int64
+	Difficulty string
 }
 
 type GetTestEventsStatsRow struct {
@@ -226,14 +228,7 @@ type GetTestEventsStatsRow struct {
 }
 
 func (q *Queries) GetTestEventsStats(ctx context.Context, arg GetTestEventsStatsParams) ([]GetTestEventsStatsRow, error) {
-	rows, err := q.db.QueryContext(ctx, getTestEventsStats,
-		arg.Limit,
-		arg.Limit_2,
-		arg.Limit_3,
-		arg.Limit_4,
-		arg.Limit_5,
-		arg.Limit_6,
-	)
+	rows, err := q.db.QueryContext(ctx, getTestEventsStats, arg.Limit, arg.Difficulty)
 	if err != nil {
 		return nil, err
 	}

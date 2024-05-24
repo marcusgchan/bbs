@@ -8,6 +8,64 @@ import (
 	stats "github.com/marcusgchan/bbs/internal/stats/views"
 )
 
+func createStats(data *database.GetTestEventsStatsRow) *stats.Stats {
+	return &stats.Stats{
+		Version:         data.Version,
+		StartDate:       data.Startdate,
+		EndDate:         data.Enddate,
+		Count:           strconv.Itoa(int(data.Numoftestevents)),
+		HighestWave:     strconv.Itoa(int(data.Maxwave)),
+		AvgWaveSurvived: fmt.Sprintf("%.2f", data.Avgwave),
+	}
+}
+
+func mergeStats(normal *[]database.GetTestEventsStatsRow, hard *[]database.GetTestEventsStatsRow) *[]stats.StatsByVersion {
+	statsByVersion := make([]stats.StatsByVersion, 0)
+	l := 0
+	r := 0
+	for l < len(*normal) || r < len(*hard) {
+		if l < len(*normal) && r < len(*hard) {
+			if (*normal)[l].Version == (*hard)[r].Version {
+				statsByVersion = append(statsByVersion, stats.StatsByVersion{
+					Version: (*normal)[l].Version,
+					Normal:  createStats(&(*normal)[l]),
+					Hard:    createStats(&(*hard)[r]),
+				})
+				l++
+				r++
+			} else if (*normal)[l].Version < (*hard)[r].Version {
+				statsByVersion = append(statsByVersion, stats.StatsByVersion{
+					Version: (*normal)[l].Version,
+					Normal:  createStats(&(*normal)[l]),
+				})
+				l++
+			} else {
+				statsByVersion = append(statsByVersion, stats.StatsByVersion{
+					Version: (*hard)[r].Version,
+					Hard:    createStats(&(*hard)[r]),
+				})
+				r++
+			}
+		}
+
+		if l < len(*normal) {
+			statsByVersion = append(statsByVersion, stats.StatsByVersion{
+				Version: (*normal)[l].Version,
+				Normal:  createStats(&(*normal)[l]),
+			})
+			l++
+		} else {
+			statsByVersion = append(statsByVersion, stats.StatsByVersion{
+				Version: (*hard)[r].Version,
+				Hard:    createStats(&(*hard)[r]),
+			})
+			r++
+		}
+	}
+
+	return &statsByVersion
+}
+
 func TransformToVersionsField(data *[]database.Version) *[]stats.Version {
 	versions := make([]stats.Version, len(*data))
 	for i, v := range *data {

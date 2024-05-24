@@ -134,13 +134,16 @@ func normalStatsPageReq(h StatsHandler, c echo.Context) error {
 			return err
 		}
 	}
-	testEventsStats, err := h.Q.GetTestEventsStats(c.Request().Context(), database.GetTestEventsStatsParams{
-		Limit:   int64(limit),
-		Limit_2: int64(limit),
-		Limit_3: int64(limit),
-		Limit_4: int64(limit),
-		Limit_5: int64(limit),
-		Limit_6: int64(limit),
+	normalTestEvtStats, err := h.Q.GetTestEventsStats(c.Request().Context(), database.GetTestEventsStatsParams{
+		Limit:      int64(limit),
+		Difficulty: "normal",
+	})
+	if err != nil {
+		return err
+	}
+	hardTestEvtStats, err := h.Q.GetTestEventsStats(c.Request().Context(), database.GetTestEventsStatsParams{
+		Limit:      int64(limit),
+		Difficulty: "hard",
 	})
 	if err != nil {
 		return err
@@ -169,7 +172,7 @@ func normalStatsPageReq(h StatsHandler, c echo.Context) error {
 
 	statsProps := stats.StatsPageProps{
 		Single:            TransformToSingleField(&singleStatsRes),
-		Multi:             TransformToMultiField(&testEventsStats),
+		Multi:             TransformToMultiField(&normalTestEvtStats),
 		Versions:          TransformToVersionsField(&versions),
 		CatastropheDeaths: TransformToCatastropheField(&catData),
 		InputDefaults:     defaults,

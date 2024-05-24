@@ -3,6 +3,12 @@ package stats
 import "github.com/marcusgchan/bbs/internal/sview"
 import "strconv"
 
+type StatsByVersion struct {
+	Version string
+	Normal  *Stats
+	Hard    *Stats
+}
+
 type Stats struct {
 	Version         string
 	AvgWaveSurvived string
@@ -20,8 +26,7 @@ type CatastropheDeaths struct {
 }
 
 type StatsPageProps struct {
-	Single            *Stats
-	Multi             *[]Stats
+	StatsByVersion    *[]StatsByVersion
 	Versions          *[]Version
 	CatastropheDeaths *[]CatastropheDeaths
 	*InputDefaults
