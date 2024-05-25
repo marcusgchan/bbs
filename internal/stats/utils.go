@@ -54,9 +54,7 @@ func mergeGeneralStats(normal *[]database.GetTestEventsStatsRow, hard *[]databas
 				})
 				r++
 			}
-		}
-
-		if l < len(*normal) {
+		} else if l < len(*normal) {
 			statsByVersion = append(statsByVersion, stats.StatsByVersion{
 				Version: (*normal)[l].Version,
 				Normal: &stats.Stats{
