@@ -3,7 +3,18 @@ package stats
 import "github.com/marcusgchan/bbs/internal/sview"
 import "strconv"
 
+type StatsByVersion struct {
+	Version string
+	Normal  *Stats
+	Hard    *Stats
+}
+
 type Stats struct {
+	GeneralStats      *GeneralStats
+	CatastropheDeaths *CatastropheDeaths
+}
+
+type GeneralStats struct {
 	Version         string
 	AvgWaveSurvived string
 	HighestWave     string
@@ -13,22 +24,18 @@ type Stats struct {
 }
 
 type CatastropheDeaths struct {
-	Version       string
 	Catastrophies []string
 	Deaths        []int
 	TotalDeaths   int
 }
 
 type StatsPageProps struct {
-	Single            *Stats
-	Multi             *[]Stats
-	Versions          *[]Version
-	CatastropheDeaths *[]CatastropheDeaths
+	StatsByVersion *[]StatsByVersion
+	Versions       *[]Version
 	*InputDefaults
 }
 
 type InputDefaults struct {
-	Catastrophe      string
 	RecentTestEvents string
 	TestEvent        string
 }
@@ -46,146 +53,92 @@ templ StatsPage(props *StatsPageProps) {
 
 templ StatsContent(props *StatsPageProps) {
 	<h1 class="text-xl">Statistics</h1>
-	<div class="gap-2 grid [grid-template-rows:min-content_1fr] [grid-template-columns:1fr_max-content] [grid-template-areas:'catastrophe-stats_recent-stats''filtered-stats_recent-stats']">
-		<section class="flex-1 flex gap-2 [grid-area:filtered-stats]">
-			<div>
-				<label>Select Version</label>
-				<select
-					hx-get="/stats"
-					hx-trigger="change"
-					hx-trigger="change"
-					class="p-2"
-					hx-target="[data-filtered-stats]"
-					hx-swap="innerHTML"
-					name="version"
-				>
-					if props.InputDefaults.TestEvent == "" {
-						<option value="" selected hidden>Select version</option>
-					}
-					for _, version := range *props.Versions {
-						<option
-							value={ version.Version }
-							if version.Version == props.InputDefaults.TestEvent {
-								selected
-							}
-						>{ version.Version }</option>
-					}
-				</select>
-			</div>
-			<div>
-				<h2 class="text-lg">Filtered Results</h2>
-				@FilteredStats(props.Single)
-			</div>
-		</section>
-		<section class="[grid-area:catastrophe-stats] min-w-0">
-			<div class="flex gap-2">
-				<h2 class="text-lg">Catastrophe Stats</h2>
-				<select class="p-2" hx-get="/stats" hx-trigger="change" hx-target="[data-catastrophe-stats-list]" hx-swap="innerHTML" name="numberOfVersionsForCatastrophe" value={ props.InputDefaults.Catastrophe }>
-					for i := 3; i < 9; i++ {
-						<option
-							value={ strconv.Itoa(i) }
-							if strconv.Itoa(i) == props.InputDefaults.Catastrophe {
-								selected
-							}
-						>{ strconv.Itoa(i) }</option>
-					}
-				</select>
-			</div>
-			@CatastropheStatsList(props.CatastropheDeaths)
-		</section>
-		<section class="space-y-2 [grid-area:recent-stats]">
-			<div class="flex gap-2">
-				<h2 class="text-lg">Recent Test Event Statistics</h2>
-				<select class="p-2" hx-target="[data-recent-stats-list]" hx-get="/stats" hx-trigger="change" hx-swap="innerHTML" name="numberOfVersionsForTestEvent" value={ props.InputDefaults.RecentTestEvents }>
-					for i := 3; i < 9; i++ {
-						<option
-							value={ strconv.Itoa(i) }
-							if strconv.Itoa(i) == props.InputDefaults.RecentTestEvents {
-								selected
-							}
-						>{ strconv.Itoa(i) }</option>
-					}
-				</select>
-			</div>
-			@RecentStatsList(props.Multi)
+	<div class="grid gap-2">
+		<section class="space-y-2">
+			<h2 class="text-lg">Stats by Version</h2>
+			<select class="p-2" hx-target="[data-stats-by-version]" hx-get="/stats" hx-trigger="change" hx-swap="outerHTML" name="numberOfVersionsForTestEvent" value={ props.InputDefaults.RecentTestEvents }>
+				for i := 1; i < 9; i++ {
+					<option
+						value={ strconv.Itoa(i) }
+						if strconv.Itoa(i) == props.InputDefaults.RecentTestEvents {
+							selected
+						}
+					>{ strconv.Itoa(i) }</option>
+				}
+			</select>
+			@StatsByVersionList(props.StatsByVersion)
 		</section>
 	</div>
 }
 
-templ CatastropheStatsList(props *[]CatastropheDeaths) {
-	<section data-catastrophe-stats-list>
-		for _, v := range *props {
-			<h3 class="text-lg">{ v.Version }</h3>
-			<div class="w-full">
-				<canvas class="h-80" id={ "catastrophe-deaths-" + v.Version }></canvas>
-			</div>
-		}
-	</section>
-	@graph(*props)
-}
-
-script graph(data []CatastropheDeaths) {
+script graph(data *CatastropheDeaths, version string, difficulty string) {
     requestAnimationFrame(() => {
-        for (const {Version, Catastrophies, Deaths} of data) {
-            const ctx = document.getElementById('catastrophe-deaths-' + Version);
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: Catastrophies,
-                    datasets: [{
-                        label: '# of Deaths',
-                        data: Deaths,
-                        borderWidth: 1
-                  }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
+        const {Version, Difficulty, Catastrophies, Deaths} = data
+        const ctx = document.getElementById(`catastrophe-deaths-${version}-${difficulty}`);
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Catastrophies,
+                datasets: [{
+                    label: '# of Deaths',
+                    data: Deaths,
+                    borderWidth: 1
+              }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
                     }
                 }
-            }); 
-        }
+            }
+        }); 
     })
 }
 
-templ FilteredStats(props *Stats) {
-	<div data-filtered-stats>
-		if props == nil {
-			<p>No Results</p>
-		} else {
-			<div>
-				<p>Version: { props.Version }</p>
-				<p>Start date: { props.StartDate }</p>
-				<p>End date: { props.EndDate }</p>
-				<p>Avg wave survived: { props.AvgWaveSurvived }</p>
-				<p>Highest wave survived: { props.HighestWave }</p>
-				<p>Total number of test events: { props.Count }</p>
-			</div>
+templ StatsByVersionList(props *[]StatsByVersion) {
+	<ul data-stats-by-version>
+		for _, s := range *props {
+			<li>
+				<h3 class="text-lg mb-2">{ s.Version }</h3>
+				if s.Normal != nil {
+					<article>
+						<h4>Normal</h4>
+						<div class="flex items-center gap-2">
+							@CatastropheDeathsComp(s.Normal.CatastropheDeaths, s.Version, "normal")
+							@GeneralStatsComp(s.Normal.GeneralStats)
+						</div>
+					</article>
+				}
+				if s.Hard != nil {
+					<article>
+						<h4>Hard</h4>
+						<div class="flex gap-2 items-center">
+							@CatastropheDeathsComp(s.Hard.CatastropheDeaths, s.Version, "hard")
+							@GeneralStatsComp(s.Hard.GeneralStats)
+						</div>
+					</article>
+				}
+			</li>
 		}
+	</ul>
+}
+
+templ GeneralStatsComp(props *GeneralStats) {
+	<div>
+		<p>Start date: { props.StartDate }</p>
+		<p>End date: { props.EndDate }</p>
+		<p>Avg wave survived: { props.AvgWaveSurvived }</p>
+		<p>Highest wave survived: { props.HighestWave }</p>
+		<p>Number of test events: { props.Count }</p>
 	</div>
 }
 
-templ RecentStatsList(versions *[]Stats) {
-	<div data-recent-stats-list>
-		if len(*versions) == 0 {
-			<p>No Versions</p>
-		} else {
-			<ul class="space-y-2">
-				for _, s := range *versions {
-					<li>
-						<p>Version: { s.Version }</p>
-						<p>Start date: { s.StartDate }</p>
-						<p>End date: { s.EndDate }</p>
-						<p>Avg wave survived: { s.AvgWaveSurvived }</p>
-						<p>Highest wave survived: { s.HighestWave }</p>
-						<p>Total number of test events: { s.Count }</p>
-					</li>
-				}
-			</ul>
-		}
+templ CatastropheDeathsComp(props *CatastropheDeaths, version string, difficulty string) {
+	<div class="w-full">
+		<canvas class="h-80 max-w-full" id={ "catastrophe-deaths-" + version + "-" + difficulty }></canvas>
 	</div>
+	@graph(props, version, difficulty)
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	database "github.com/marcusgchan/bbs/database/gen"
 	"github.com/marcusgchan/bbs/internal"
-	"github.com/marcusgchan/bbs/internal/stats/views"
+	stats "github.com/marcusgchan/bbs/internal/stats/views"
 	"github.com/marcusgchan/bbs/internal/sview"
 )
 
@@ -22,40 +22,72 @@ func (h StatsHandler) StatsPage(c echo.Context) error {
 	var err error
 	switch reqType {
 	case "numberOfVersionsForTestEvent":
-		err = recentTestEvents(h, c)
-	case "numberOfVersionsForCatastrophe":
-		err = catastrophe(h, c)
-	case "version":
-		err = testEvent(h, c)
+		err = partialStatsPageReq(h, c)
+	// case "numberOfVersionsForCatastrophe":
+	// 	err = catastrophe(h, c)
+	// case "version":
+	// 	err = testEvent(h, c)
 	default:
 		err = normalStatsPageReq(h, c)
 	}
 	return err
 }
 
-func recentTestEvents(h StatsHandler, c echo.Context) error {
+func partialStatsPageReq(h StatsHandler, c echo.Context) error {
 	if !internal.FromHTMX(c) {
 		return internal.Render(sview.NotFoundPage(), c)
 	}
-	numOfVersions := parseTestEventQueryParams(c.QueryParam("numberOfVersionsForTestEvent"))
-	data, err := h.Q.GetTestEventsStats(c.Request().Context(), database.GetTestEventsStatsParams{
-		Limit:   int64(numOfVersions),
-		Limit_2: int64(numOfVersions),
-		Limit_3: int64(numOfVersions),
-		Limit_4: int64(numOfVersions),
-		Limit_5: int64(numOfVersions),
-		Limit_6: int64(numOfVersions),
+	limit := parseTestEventQueryParams(c.QueryParam("numberOfVersionsForTestEvent"))
+
+	err := SetPushUrlInHeader(c, strconv.Itoa(limit))
+	if err != nil {
+		return err
+	}
+
+	normalTestEvtStats, err := h.Q.GetTestEventsStats(c.Request().Context(), database.GetTestEventsStatsParams{
+		Limit:        int64(limit),
+		Limit_2:      int64(limit),
+		Limit_3:      int64(limit),
+		Limit_4:      int64(limit),
+		Limit_5:      int64(limit),
+		Limit_6:      int64(limit),
+		Difficulty:   "normal",
+		Difficulty_2: "normal",
+		Difficulty_3: "normal",
+		Difficulty_4: "normal",
+		Difficulty_5: "normal",
+		Difficulty_6: "normal",
+	})
+	if err != nil {
+		return err
+	}
+	hardTestEvtStats, err := h.Q.GetTestEventsStats(c.Request().Context(), database.GetTestEventsStatsParams{
+		Limit:        int64(limit),
+		Limit_2:      int64(limit),
+		Limit_3:      int64(limit),
+		Limit_4:      int64(limit),
+		Limit_5:      int64(limit),
+		Limit_6:      int64(limit),
+		Difficulty:   "hard",
+		Difficulty_2: "hard",
+		Difficulty_3: "hard",
+		Difficulty_4: "hard",
+		Difficulty_5: "hard",
+		Difficulty_6: "hard",
 	})
 	if err != nil {
 		return err
 	}
 
-	err = SetPushUrlInHeader(c, strconv.Itoa(numOfVersions))
+	catData, err := h.Q.GetCatastropheKills(c.Request().Context(), int64(limit))
 	if err != nil {
 		return err
 	}
 
-	return internal.Render(stats.RecentStatsList(TransformToMultiField(&data)), c)
+	statsByVersion := mergeGeneralStats(&normalTestEvtStats, &hardTestEvtStats)
+	addCatastropheDeathsToStats(statsByVersion, &catData)
+
+	return internal.Render(stats.StatsByVersionList(statsByVersion), c)
 }
 
 func SetPushUrlInHeader(c echo.Context, val string) error {
@@ -71,50 +103,50 @@ func SetPushUrlInHeader(c echo.Context, val string) error {
 	return nil
 }
 
-func testEvent(h StatsHandler, c echo.Context) error {
-	if !internal.FromHTMX(c) {
-		return internal.Render(sview.NotFoundPage(), c)
-	}
-	version := c.QueryParam("version")
-	data, err := h.Q.GetTestEventStatsByVersion(c.Request().Context(), database.GetTestEventStatsByVersionParams{
-		Version:   version,
-		Version_2: version,
-		Version_3: version,
-		Version_4: version,
-		Version_5: version,
-		Version_6: version,
-	})
-	if err != nil && err != sql.ErrNoRows {
-		return err
-	}
+// func testEvent(h StatsHandler, c echo.Context) error {
+// 	if !internal.FromHTMX(c) {
+// 		return internal.Render(sview.NotFoundPage(), c)
+// 	}
+// 	version := c.QueryParam("version")
+// 	data, err := h.Q.GetTestEventStatsByVersion(c.Request().Context(), database.GetTestEventStatsByVersionParams{
+// 		Version:   version,
+// 		Version_2: version,
+// 		Version_3: version,
+// 		Version_4: version,
+// 		Version_5: version,
+// 		Version_6: version,
+// 	})
+// 	if err != nil && err != sql.ErrNoRows {
+// 		return err
+// 	}
+//
+// 	err = SetPushUrlInHeader(c, version)
+// 	if err != nil {
+// 		return err
+// 	}
+//
+// 	return internal.Render(stats.FilteredStats(TransformToStatsField(&data)), c)
+// }
 
-	err = SetPushUrlInHeader(c, version)
-	if err != nil {
-		return err
-	}
-
-	return internal.Render(stats.FilteredStats(TransformToStatsField(&data)), c)
-}
-
-func catastrophe(h StatsHandler, c echo.Context) error {
-	if !internal.FromHTMX(c) {
-		return internal.Render(sview.NotFoundPage(), c)
-	}
-
-	count := parseCatastropheQueryParams(c.QueryParam("numberOfVersionsForCatastrophe"))
-
-	data, err := h.Q.GetCatastropheKills(c.Request().Context(), int64(count))
-	if err != nil {
-		return err
-	}
-
-	err = SetPushUrlInHeader(c, strconv.Itoa(count))
-	if err != nil {
-		return err
-	}
-
-	return internal.Render(stats.CatastropheStatsList(TransformToCatastropheField(&data)), c)
-}
+// func catastrophe(h StatsHandler, c echo.Context) error {
+// 	if !internal.FromHTMX(c) {
+// 		return internal.Render(sview.NotFoundPage(), c)
+// 	}
+//
+// 	count := parseCatastropheQueryParams(c.QueryParam("numberOfVersionsForCatastrophe"))
+//
+// 	data, err := h.Q.GetCatastropheKills(c.Request().Context(), int64(count))
+// 	if err != nil {
+// 		return err
+// 	}
+//
+// 	err = SetPushUrlInHeader(c, strconv.Itoa(count))
+// 	if err != nil {
+// 		return err
+// 	}
+//
+// 	return internal.Render(stats.CatastropheStatsList(TransformToCatastropheField(&data)), c)
+// }
 
 func normalStatsPageReq(h StatsHandler, c echo.Context) error {
 	limit := parseTestEventQueryParams(c.QueryParam("numberOfVersionsForTestEvent"))
@@ -134,31 +166,51 @@ func normalStatsPageReq(h StatsHandler, c echo.Context) error {
 			return err
 		}
 	}
-	testEventsStats, err := h.Q.GetTestEventsStats(c.Request().Context(), database.GetTestEventsStatsParams{
-		Limit:   int64(limit),
-		Limit_2: int64(limit),
-		Limit_3: int64(limit),
-		Limit_4: int64(limit),
-		Limit_5: int64(limit),
-		Limit_6: int64(limit),
+	versions, err := h.Q.GetVersions(c.Request().Context())
+	if err != nil {
+		return err
+	}
+	normalTestEvtStats, err := h.Q.GetTestEventsStats(c.Request().Context(), database.GetTestEventsStatsParams{
+		Limit:        int64(limit),
+		Limit_2:      int64(limit),
+		Limit_3:      int64(limit),
+		Limit_4:      int64(limit),
+		Limit_5:      int64(limit),
+		Limit_6:      int64(limit),
+		Difficulty:   "normal",
+		Difficulty_2: "normal",
+		Difficulty_3: "normal",
+		Difficulty_4: "normal",
+		Difficulty_5: "normal",
+		Difficulty_6: "normal",
+	})
+	if err != nil {
+		return err
+	}
+	hardTestEvtStats, err := h.Q.GetTestEventsStats(c.Request().Context(), database.GetTestEventsStatsParams{
+		Limit:        int64(limit),
+		Limit_2:      int64(limit),
+		Limit_3:      int64(limit),
+		Limit_4:      int64(limit),
+		Limit_5:      int64(limit),
+		Limit_6:      int64(limit),
+		Difficulty:   "hard",
+		Difficulty_2: "hard",
+		Difficulty_3: "hard",
+		Difficulty_4: "hard",
+		Difficulty_5: "hard",
+		Difficulty_6: "hard",
 	})
 	if err != nil {
 		return err
 	}
 
-	versions, err := h.Q.GetVersions(c.Request().Context())
-	if err != nil {
-		return err
-	}
-
-	n := parseCatastropheQueryParams(c.QueryParam("numberOfVersionsForCatastrophe"))
-	catData, err := h.Q.GetCatastropheKills(c.Request().Context(), int64(n))
+	catData, err := h.Q.GetCatastropheKills(c.Request().Context(), int64(limit))
 	if err != nil {
 		return err
 	}
 
 	defaults := &stats.InputDefaults{
-		Catastrophe:      strconv.Itoa(n),
 		RecentTestEvents: strconv.Itoa(limit),
 		TestEvent:        version,
 	}
@@ -167,12 +219,13 @@ func normalStatsPageReq(h StatsHandler, c echo.Context) error {
 		defaults.TestEvent = version
 	}
 
+	statsByVersion := mergeGeneralStats(&normalTestEvtStats, &hardTestEvtStats)
+	addCatastropheDeathsToStats(statsByVersion, &catData)
+
 	statsProps := stats.StatsPageProps{
-		Single:            TransformToSingleField(&singleStatsRes),
-		Multi:             TransformToMultiField(&testEventsStats),
-		Versions:          TransformToVersionsField(&versions),
-		CatastropheDeaths: TransformToCatastropheField(&catData),
-		InputDefaults:     defaults,
+		Versions:       TransformToVersionsField(&versions),
+		StatsByVersion: statsByVersion,
+		InputDefaults:  defaults,
 	}
 
 	if internal.FromHTMX(c) {
