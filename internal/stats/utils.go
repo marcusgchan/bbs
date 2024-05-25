@@ -8,8 +8,8 @@ import (
 	stats "github.com/marcusgchan/bbs/internal/stats/views"
 )
 
-func createStats(data *database.GetTestEventsStatsRow) *stats.Stats {
-	return &stats.Stats{
+func createStats(data *database.GetTestEventsStatsRow) *stats.GeneralStats {
+	return &stats.GeneralStats{
 		Version:         data.Version,
 		StartDate:       data.Startdate,
 		EndDate:         data.Enddate,
@@ -28,21 +28,29 @@ func mergeStats(normal *[]database.GetTestEventsStatsRow, hard *[]database.GetTe
 			if (*normal)[l].Version == (*hard)[r].Version {
 				statsByVersion = append(statsByVersion, stats.StatsByVersion{
 					Version: (*normal)[l].Version,
-					Normal:  createStats(&(*normal)[l]),
-					Hard:    createStats(&(*hard)[r]),
+					Normal: &stats.Stats{
+						GeneralStats: createStats(&((*normal)[l])),
+					},
+					Hard: &stats.Stats{
+						GeneralStats: createStats(&((*hard)[r])),
+					},
 				})
 				l++
 				r++
 			} else if (*normal)[l].Version < (*hard)[r].Version {
 				statsByVersion = append(statsByVersion, stats.StatsByVersion{
 					Version: (*normal)[l].Version,
-					Normal:  createStats(&(*normal)[l]),
+					Normal: &stats.Stats{
+						GeneralStats: createStats(&((*normal)[l])),
+					},
 				})
 				l++
 			} else {
 				statsByVersion = append(statsByVersion, stats.StatsByVersion{
 					Version: (*hard)[r].Version,
-					Hard:    createStats(&(*hard)[r]),
+					Hard: &stats.Stats{
+						GeneralStats: createStats(&((*hard)[r])),
+					},
 				})
 				r++
 			}
@@ -51,13 +59,17 @@ func mergeStats(normal *[]database.GetTestEventsStatsRow, hard *[]database.GetTe
 		if l < len(*normal) {
 			statsByVersion = append(statsByVersion, stats.StatsByVersion{
 				Version: (*normal)[l].Version,
-				Normal:  createStats(&(*normal)[l]),
+				Normal: &stats.Stats{
+					GeneralStats: createStats(&((*normal)[l])),
+				},
 			})
 			l++
 		} else {
 			statsByVersion = append(statsByVersion, stats.StatsByVersion{
 				Version: (*hard)[r].Version,
-				Hard:    createStats(&(*hard)[r]),
+				Hard: &stats.Stats{
+					GeneralStats: createStats(&((*hard)[r])),
+				},
 			})
 			r++
 		}
