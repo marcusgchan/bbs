@@ -36,7 +36,6 @@ type StatsPageProps struct {
 }
 
 type InputDefaults struct {
-	Catastrophe      string
 	RecentTestEvents string
 	TestEvent        string
 }
@@ -55,10 +54,10 @@ templ StatsPage(props *StatsPageProps) {
 templ StatsContent(props *StatsPageProps) {
 	<h1 class="text-xl">Statistics</h1>
 	<div class="grid gap-2">
-		<section class="space-y-2 [grid-area:recent-stats]">
+		<section class="space-y-2">
 			<h2 class="text-lg">Stats by Version</h2>
-			<select class="p-2" hx-target="[data-recent-stats-list]" hx-get="/stats" hx-trigger="change" hx-swap="innerHTML" name="numberOfVersionsForTestEvent" value={ props.InputDefaults.RecentTestEvents }>
-				for i := 3; i < 9; i++ {
+			<select class="p-2" hx-target="[data-stats-by-version]" hx-get="/stats" hx-trigger="change" hx-swap="outerHTML" name="numberOfVersionsForTestEvent" value={ props.InputDefaults.RecentTestEvents }>
+				for i := 1; i < 9; i++ {
 					<option
 						value={ strconv.Itoa(i) }
 						if strconv.Itoa(i) == props.InputDefaults.RecentTestEvents {
@@ -100,14 +99,14 @@ script graph(data *CatastropheDeaths, version string, difficulty string) {
 }
 
 templ StatsByVersionList(props *[]StatsByVersion) {
-	<ul>
+	<ul data-stats-by-version>
 		for _, s := range *props {
 			<li>
 				<h3 class="text-lg mb-2">{ s.Version }</h3>
 				if s.Normal != nil {
 					<article>
 						<h4>Normal</h4>
-						<div class="flex gap-2">
+						<div class="flex items-center gap-2">
 							@CatastropheDeathsComp(s.Normal.CatastropheDeaths, s.Version, "normal")
 							@GeneralStatsComp(s.Normal.GeneralStats)
 						</div>
@@ -116,7 +115,7 @@ templ StatsByVersionList(props *[]StatsByVersion) {
 				if s.Hard != nil {
 					<article>
 						<h4>Hard</h4>
-						<div class="flex gap-2">
+						<div class="flex gap-2 items-center">
 							@CatastropheDeathsComp(s.Hard.CatastropheDeaths, s.Version, "hard")
 							@GeneralStatsComp(s.Hard.GeneralStats)
 						</div>
@@ -139,7 +138,7 @@ templ GeneralStatsComp(props *GeneralStats) {
 
 templ CatastropheDeathsComp(props *CatastropheDeaths, version string, difficulty string) {
 	<div class="w-full">
-		<canvas class="h-80" id={ "catastrophe-deaths-" + version + "-" + difficulty }></canvas>
+		<canvas class="h-80 max-w-full" id={ "catastrophe-deaths-" + version + "-" + difficulty }></canvas>
 	</div>
 	@graph(props, version, difficulty)
 }
