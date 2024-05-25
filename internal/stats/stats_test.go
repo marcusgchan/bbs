@@ -59,11 +59,17 @@ func TestMostRecentStatsWithNoContent(t *testing.T) {
 	t.Run("it should return empty array - limit 5", func(t *testing.T) {
 		limit := int64(5)
 		data, err := q.GetTestEventsStats(mc, sqlc.GetTestEventsStatsParams{
-			Limit:   limit,
-			Limit_2: limit,
-			Limit_3: limit,
-			Limit_4: limit,
-			Limit_5: limit,
+			Limit:        limit,
+			Limit_2:      limit,
+			Limit_3:      limit,
+			Limit_4:      limit,
+			Limit_5:      limit,
+			Difficulty:   "normal",
+			Difficulty_2: "normal",
+			Difficulty_3: "normal",
+			Difficulty_4: "normal",
+			Difficulty_5: "normal",
+			Difficulty_6: "normal",
 		})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to execute query %s", err)
@@ -119,11 +125,17 @@ func TestMostRecentStatsWithTestEventButNoTestResult(t *testing.T) {
 	t.Run("it should return empty array", func(t *testing.T) {
 		limit := int64(1)
 		data, err := q.GetTestEventsStats(mc, sqlc.GetTestEventsStatsParams{
-			Limit:   limit,
-			Limit_2: limit,
-			Limit_3: limit,
-			Limit_4: limit,
-			Limit_5: limit,
+			Limit:        limit,
+			Limit_2:      limit,
+			Limit_3:      limit,
+			Limit_4:      limit,
+			Limit_5:      limit,
+			Difficulty:   "normal",
+			Difficulty_2: "normal",
+			Difficulty_3: "normal",
+			Difficulty_4: "normal",
+			Difficulty_5: "normal",
+			Difficulty_6: "normal",
 		})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to execute query %s", err)
@@ -177,12 +189,18 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 	t.Run("it should return test evt with avg wave of 10, max wave of 10, count 1", func(t *testing.T) {
 		limit := int64(1)
 		data, err := q.GetTestEventsStats(mc, sqlc.GetTestEventsStatsParams{
-			Limit:   limit,
-			Limit_2: limit,
-			Limit_3: limit,
-			Limit_4: limit,
-			Limit_5: limit,
-			Limit_6: limit,
+			Limit:        limit,
+			Limit_2:      limit,
+			Limit_3:      limit,
+			Limit_4:      limit,
+			Limit_5:      limit,
+			Limit_6:      limit,
+			Difficulty:   "normal",
+			Difficulty_2: "normal",
+			Difficulty_3: "normal",
+			Difficulty_4: "normal",
+			Difficulty_5: "normal",
+			Difficulty_6: "normal",
 		})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to execute query %s", err)
@@ -214,12 +232,18 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 	t.Run("it should return 2 test evt with #1 with avg wave of 20 max wave 20 count 1 #2 with avg wave of 20 max wave of 20 count 1", func(t *testing.T) {
 		limit := int64(2)
 		data, err := q.GetTestEventsStats(mc, sqlc.GetTestEventsStatsParams{
-			Limit:   limit,
-			Limit_2: limit,
-			Limit_3: limit,
-			Limit_4: limit,
-			Limit_5: limit,
-			Limit_6: limit,
+			Limit:        limit,
+			Limit_2:      limit,
+			Limit_3:      limit,
+			Limit_4:      limit,
+			Limit_5:      limit,
+			Limit_6:      limit,
+			Difficulty:   "normal",
+			Difficulty_2: "normal",
+			Difficulty_3: "normal",
+			Difficulty_4: "normal",
+			Difficulty_5: "normal",
+			Difficulty_6: "normal",
 		})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to execute query %s", err)
@@ -261,12 +285,18 @@ func TestMostRecentStatsWithTestEventWithTestResults(t *testing.T) {
 	t.Run("it should return 2 evt: #1 avg wave 15 max wave 20 count 2 #2 avg wave 10 max wave 10 num of events 1", func(t *testing.T) {
 		limit := int64(2)
 		data, err := q.GetTestEventsStats(mc, sqlc.GetTestEventsStatsParams{
-			Limit:   limit,
-			Limit_2: limit,
-			Limit_3: limit,
-			Limit_4: limit,
-			Limit_5: limit,
-			Limit_6: limit,
+			Limit:        limit,
+			Limit_2:      limit,
+			Limit_3:      limit,
+			Limit_4:      limit,
+			Limit_5:      limit,
+			Limit_6:      limit,
+			Difficulty:   "normal",
+			Difficulty_2: "normal",
+			Difficulty_3: "normal",
+			Difficulty_4: "normal",
+			Difficulty_5: "normal",
+			Difficulty_6: "normal",
 		})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to execute query %s", err)

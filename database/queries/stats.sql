@@ -5,24 +5,24 @@ SELECT AvgWave.version, AvgWave.avgWave, AvgMoney.avgMoneyEarned, MaxWave.maxWav
     FROM (
         SELECT DISTINCT value as version FROM versions
         ORDER BY value DESC
-        LIMIT @limit
+        LIMIT ?
     ) as S
     JOIN test_events ON test_events.version = S.version
     INNER JOIN test_results ON test_events.testResultId = test_results.id
     JOIN player_test_results ON test_events.testResultId = player_test_results.testresultId
-    WHERE test_events.difficulty = @difficulty
+    WHERE test_events.difficulty = ?
     GROUP BY test_events.version
 ) as AvgWave, (
     SELECT test_events.version, CAST(MAX(player_test_results.wavesSurvived) AS INTEGER) as maxWave
     FROM (
         SELECT DISTINCT value as version FROM versions
         ORDER BY value DESC
-        LIMIT @limit
+        LIMIT ?
     ) as S
     JOIN test_events ON test_events.version = S.version
     INNER JOIN test_results ON test_events.testResultId = test_results.id
     JOIN player_test_results ON test_events.testResultId = player_test_results.testresultId
-    WHERE test_events.difficulty = @difficulty
+    WHERE test_events.difficulty = ?
     GROUP BY test_events.version
 ) as MaxWave, (
     SELECT test_events.version, CAST(AVG(test_results.moneyEarned) as REAL) as avgMoneyEarned
@@ -30,11 +30,11 @@ SELECT AvgWave.version, AvgWave.avgWave, AvgMoney.avgMoneyEarned, MaxWave.maxWav
         SELECT DISTINCT value as version 
         FROM versions
         ORDER BY value DESC
-        LIMIT @limit
+        LIMIT ?
     ) as S
     JOIN test_events ON test_events.version = S.version
     INNER JOIN test_results ON test_events.testResultId = test_results.id
-    WHERE test_events.difficulty = @difficulty
+    WHERE test_events.difficulty = ?
     GROUP BY test_events.version
 ) as AvgMoney, (
     SELECT test_events.version, COUNT(test_events.id) as numOfTestEvents
@@ -42,33 +42,33 @@ SELECT AvgWave.version, AvgWave.avgWave, AvgMoney.avgMoneyEarned, MaxWave.maxWav
         SELECT DISTINCT value as version 
         FROM versions
         ORDER BY value DESC
-        LIMIT @limit
+        LIMIT ?
     ) as S
     JOIN test_events ON test_events.version = S.version
     WHERE test_events.testResultId IS NOT NULL
-    AND test_events.difficulty = @difficulty
+    AND test_events.difficulty = ?
     GROUP BY test_events.version
 ) as Count, (
     SELECT test_events.version, CAST(MIN(test_events.startedAt) AS TEXT) as startDate
     FROM (
         SELECT DISTINCT value as version FROM versions
         ORDER BY value DESC
-        LIMIT @limit
+        LIMIT ?
     ) as S
     JOIN test_events ON test_events.version = S.version
     WHERE test_events.testResultId IS NOT NULL
-    AND test_events.difficulty = @difficulty
+    AND test_events.difficulty = ?
     GROUP BY test_events.version
 ) as StartDate, (
     SELECT test_events.version, CAST(MAX(test_results.endedAt) AS TEXT) as endDate
     FROM (
         SELECT DISTINCT value as version FROM versions
         ORDER BY value DESC
-        LIMIT @limit
+        LIMIT ?
     ) as S
     JOIN test_events ON test_events.version = S.version
     INNER JOIN test_results ON test_events.testResultId = test_results.id
-    WHERE test_events.difficulty = @difficulty
+    WHERE test_events.difficulty = ?
     GROUP BY test_events.version
 ) as EndDate
 WHERE AvgWave.version = MaxWave.version
@@ -119,7 +119,7 @@ AND StartDate.version = EndDate.version;
 SELECT * FROM versions;
 
 -- name: GetCatastropheKills :many
-SELECT test_events.version, player_test_results.diedTo as catastrophe, COUNT(*) as deaths
+SELECT test_events.version, test_events.difficulty, player_test_results.diedTo as catastrophe, COUNT(*) as deaths
 FROM (
     SELECT DISTINCT value as version FROM versions
     ORDER BY value DESC
@@ -128,5 +128,5 @@ FROM (
 JOIN test_events ON test_events.version = S.version
 INNER JOIN test_results ON test_events.testResultId = test_results.id
 JOIN player_test_results ON test_events.testResultId = player_test_results.testresultId
-GROUP BY test_events.version, player_test_results.diedTo
+GROUP BY test_events.version, test_events.difficulty, player_test_results.diedTo
 ORDER BY test_events.version DESC, player_test_results.diedTo ASC;

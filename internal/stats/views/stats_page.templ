@@ -24,8 +24,6 @@ type GeneralStats struct {
 }
 
 type CatastropheDeaths struct {
-	Version       string
-	Difficulty    string
 	Catastrophies []string
 	Deaths        []int
 	TotalDeaths   int
@@ -74,10 +72,10 @@ templ StatsContent(props *StatsPageProps) {
 	</div>
 }
 
-script graph(data *CatastropheDeaths) {
+script graph(data *CatastropheDeaths, version string, difficulty string) {
     requestAnimationFrame(() => {
         const {Version, Difficulty, Catastrophies, Deaths} = data
-        const ctx = document.getElementById('catastrophe-deaths-' + Difficulty + "-" + Version);
+        const ctx = document.getElementById(`catastrophe-deaths-${version}-${difficulty}`);
         new Chart(ctx, {
             type: 'bar',
             data: {
@@ -105,14 +103,24 @@ templ StatsByVersionList(props *[]StatsByVersion) {
 	<ul>
 		for _, s := range *props {
 			<li>
-				<h3>{ s.Version }</h3>
+				<h3 class="text-lg mb-2">{ s.Version }</h3>
 				if s.Normal != nil {
-					@CatastropheDeathsComp(s.Normal.CatastropheDeaths)
-					@GeneralStatsComp(s.Normal.GeneralStats)
+					<article>
+						<h4>Normal</h4>
+						<div class="flex gap-2">
+							@CatastropheDeathsComp(s.Normal.CatastropheDeaths, s.Version, "normal")
+							@GeneralStatsComp(s.Normal.GeneralStats)
+						</div>
+					</article>
 				}
 				if s.Hard != nil {
-					@CatastropheDeathsComp(s.Hard.CatastropheDeaths)
-					@GeneralStatsComp(s.Hard.GeneralStats)
+					<article>
+						<h4>Hard</h4>
+						<div class="flex gap-2">
+							@CatastropheDeathsComp(s.Hard.CatastropheDeaths, s.Version, "hard")
+							@GeneralStatsComp(s.Hard.GeneralStats)
+						</div>
+					</article>
 				}
 			</li>
 		}
@@ -125,13 +133,13 @@ templ GeneralStatsComp(props *GeneralStats) {
 		<p>End date: { props.EndDate }</p>
 		<p>Avg wave survived: { props.AvgWaveSurvived }</p>
 		<p>Highest wave survived: { props.HighestWave }</p>
-		<p>Total number of test events: { props.Count }</p>
+		<p>Number of test events: { props.Count }</p>
 	</div>
 }
 
-templ CatastropheDeathsComp(props *CatastropheDeaths) {
+templ CatastropheDeathsComp(props *CatastropheDeaths, version string, difficulty string) {
 	<div class="w-full">
-		<canvas class="h-80" id={ "catastrophe-deaths-" + props.Version }></canvas>
+		<canvas class="h-80" id={ "catastrophe-deaths-" + version + "-" + difficulty }></canvas>
 	</div>
-	@graph(props)
+	@graph(props, version, difficulty)
 }
