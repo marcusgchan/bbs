@@ -41,6 +41,12 @@ func main() {
 	app.Use(middleware.StaticWithConfig(middleware.StaticConfig{
 		Filesystem: http.FS(web.StaticFS),
 	}))
+	app.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			c.Response().Header().Set("Very", "HX-Request")
+			return next(c)
+		}
+	})
 
 	app.GET("/login", auth.AuthHandler{Q: q, DB: db}.Login)
 	app.POST("/login", auth.AuthHandler{Q: q, DB: db}.HandleLogin)
