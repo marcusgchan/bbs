@@ -68,6 +68,11 @@ func main() {
 	statsHandler := stats.StatsHandler{Q: q, DB: db}
 	statsGroup.GET("", statsHandler.StatsPage)
 
+	app.GET("/", func(c echo.Context) error {
+		c.Response().Header().Set("HX-Push-Url", "/test-events")
+		return testEventsHandler.TestEvtPage(c)
+	}, auth.Authenticated)
+
 	app.GET("/*", func(c echo.Context) error {
 		return internal.Render(sview.NotFoundPage(), c)
 	}, auth.Authenticated)
