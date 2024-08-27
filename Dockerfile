@@ -12,7 +12,7 @@ RUN --mount=type=cache,id=s/86f41c16-56f7-4121-b03b-097e276cf191-pnpm,target=/pn
 RUN pnpm run build
 
 
-FROM golang:${GO_VERSION}-alpine as builder
+FROM golang:${GO_VERSION}-alpine AS builder
 
 WORKDIR /app
 
@@ -20,7 +20,7 @@ COPY go.mod go.sum ./
 
 RUN go mod download && go mod verify
 
-RUN go install github.com/a-h/templ/cmd/templ
+RUN go install github.com/a-h/templ/cmd/templ@v0.2.771
 COPY . /app
 
 COPY --from=build /app/web/static /app/web/static
